@@ -24,7 +24,7 @@ const UserDropdown: React.FC<Props> = (props: Props) => {
             as="button"
             classNames={{
                 base: "flex-row-reverse",
-                name: "text-foreground",
+                name: "text-foreground text-lg",
                 description: "text-foreground/50"
             }}
             className="transition-transform"

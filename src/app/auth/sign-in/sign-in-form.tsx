@@ -88,9 +88,13 @@ const SignInForm: React.FC = () => {
                     <Button type="submit" 
                     className="w-full mt-4" 
                     variant="solid" 
-                    color="primary" size="lg">
+                    color="primary" size="lg"
+                    isDisabled={isLoading}>
                         {isLoading ? <Spinner size="sm" color="white"/> : "Continue"}
                     </Button>
+
+                    <span className="text-sm mx-auto">Don&apos;t have an account? <Link href="/auth/sign-up" className="text-primary hover:underline">Sign Up</Link></span>
+
                 </Form>
                 <div className="flex gap-2 flex-row w-full text-content-2">
                     <div className="h-[2px] my-auto bg-content2 rounded-full  w-full"/>

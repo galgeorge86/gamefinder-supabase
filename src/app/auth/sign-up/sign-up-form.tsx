@@ -1,6 +1,6 @@
 'use client'
 
-import { addToast, Button, Card, CardBody, CardHeader, Checkbox, Form, Input, Spinner } from "@heroui/react"
+import { addToast, Button, Card, CardBody, CardHeader, Form, Input, Spinner } from "@heroui/react"
 import { FormEvent, useState } from "react"
 import { FaFacebook } from "react-icons/fa"
 import { FcGoogle } from "react-icons/fc"
@@ -156,11 +156,12 @@ const SignUpForm: React.FC = () => {
                     <Button type="submit" 
                     className="w-full mt-4" 
                     variant="solid" 
-                    color="primary" size="lg">
+                    color="primary" size="lg"
+                    isDisabled={isLoading}>
                         {isLoading ? <Spinner size="sm" color="white"/> : "Continue"}
                     </Button>
 
-                    <span className="text-sm mx-auto">Already have an account? <Link href="/auth/sign-in" className="text-primary">Sign In</Link></span>
+                    <span className="text-sm mx-auto">Already have an account? <Link href="/auth/sign-in" className="text-primary hover:underline">Sign In</Link></span>
                 </Form>
                 <div className="flex gap-2 flex-row w-full text-content-2">
                     <div className="h-[2px] my-auto bg-content2 rounded-full  w-full"/>

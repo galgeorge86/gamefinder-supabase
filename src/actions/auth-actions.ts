@@ -111,6 +111,30 @@ const forgotPassword = async ({email}: {email: string}) => {
     }
 
     } catch (e) {
+        console.log(e)
+        return {
+            message: "server_error",
+            status: 500
+        }
+    }
+}
+
+const resetPassword = async ({newPassword}: {newPassword: string}) => {
+    try {
+        const supabase = await createClient()
+        const {error} = await supabase.auth.updateUser({password: newPassword})
+        if (error) {
+            return {
+                message: error.code,
+                status: 400,
+            }
+        }
+        return {
+            message: "success",
+            status: 200,
+        }
+    } catch (e) {
+        console.log(e)
         return {
             message: "server_error",
             status: 500
@@ -127,4 +151,4 @@ const signOut = async () => {
     redirect('/', RedirectType.push)
 }
 
-export {signUp, verifyOTP, signIn, signOut, forgotPassword}
+export {signUp, verifyOTP, signIn, signOut, forgotPassword, resetPassword}

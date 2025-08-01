@@ -1,3 +1,5 @@
+'use client'
+
 import { forgotPassword } from "@/actions/auth-actions"
 import { addToast, Button, Card, CardBody, CardHeader, Form, Input, Spinner } from "@heroui/react"
 import { FormEvent, useState } from "react"
@@ -70,7 +72,8 @@ const ForgotPasswordForm: React.FC = () => {
                     <Button type="submit" 
                     className="w-full mt-4" 
                     variant="solid" 
-                    color="primary" size="lg">
+                    color="primary" size="lg"
+                    isDisabled={isLoading}>
                         {isLoading ? <Spinner size="sm" color="white"/> : "Continue"}
                     </Button>
                 </Form>

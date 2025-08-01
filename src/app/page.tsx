@@ -15,9 +15,9 @@ export default function Home() {
         </div>
         <div className="flex flex-col gap-2 text-left">
           <span className="text-foreground/50">Currently supported games:</span>
-          <div className="flex flex-row gap-2">
-            <div className="rounded-xl border-1 border-content2 shadow-xl flex overflow-hidden bg-white w-1/2 p-2">
-              <Image alt="mtg-logo" height={128} width={128} src="/images/mtg-logo.png" className="m-auto"></Image>
+          <div className="flex flex-row gap-2 max-w-md">
+            <div className="rounded-xl border-1 border-content2 shadow-xl flex overflow-hidden bg-white w-1/2 p-4">
+              <img alt="mtg-logo" src="/images/mtg-logo.png" className="w-full m-auto"/>
             </div>
             <div className="rounded-xl border-1 border-content2 shadow-xl flex overflow-hidden bg-content1 w-1/2 p-2">
               <span className="text-center items-center w-full m-auto text-foreground/50">...and more to come</span>

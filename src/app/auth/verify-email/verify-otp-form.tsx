@@ -38,7 +38,7 @@ const VerifyOTPForm: React.FC = () => {
                     addToast({
                         color: "danger",
                         title: "Confirmation error",
-                        description: "An uknown error has occured."
+                        description: "An unknown error has occured."
                     })
                     break;
                 }
@@ -66,7 +66,7 @@ const VerifyOTPForm: React.FC = () => {
                     name="token"
                     length={6} size="lg"
                     className="m-auto"/>
-                    <Button size="lg"  color="primary" className="w-full" type="submit">
+                    <Button size="lg"  color="primary" className="w-full" type="submit" isDisabled={isLoading}>
                         {isLoading ? <Spinner size="sm" color="white"/> : "Continue"}
                     </Button>
                 </Form>

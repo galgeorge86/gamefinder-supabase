@@ -1,69 +1,236 @@
 'use client'
 
-import { Button, Card, CardBody, CardHeader, Form, Input, Select, SelectItem, Spinner, Textarea } from "@heroui/react"
-import { FormEvent, useState } from "react"
+import { addToast, Button, Card, CardBody, CardHeader, Chip, Form, Input, Select, SelectItem, SelectSection, SharedSelection, Spinner, Textarea } from "@heroui/react"
+import { ChangeEvent, FormEvent, useRef, useState } from "react"
 
 import { redirect } from "next/navigation"
-import { signIn } from "@/actions/auth-actions"
+import { RiMapFill, RiMapPinFill, RiUserAddFill } from "react-icons/ri"
+import { playLocationsData, playStyleData } from "@/data/constants"
+import { submitOnboarding } from "@/actions/user-actions"
+
+
 
 const OnboardingForm: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false)
+    const [username, setUsername] = useState("")
+    const [bio, setBio] = useState("")
+    const [location, setLocation] = useState("")
+    const [playLocation, setPlayLocation] = useState("")
+
+    const hiddenImageInput = useRef<HTMLInputElement>(null)
+    const [image, setImage] = useState<File>()
+    const [imagePreview, setImagePreview] = useState("")
+
+    const [playStyles, setPlayStyles] = useState<SharedSelection>()
 
     const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        setIsLoading(true)
 
-        const {email, password} = Object.fromEntries(new FormData(e.currentTarget))
-        if (typeof email === 'string' && typeof password === 'string') {
-            const res = await signIn({email: email, password: password})
-            if(res.status === 200) {
-                return redirect(`/`)
+        if(username && location && playLocation && playStyles) { // bio and image are not mandatory
+            setIsLoading(true)
+            const playStylesArray = Array.from(new Set(playStyles)).map((key) => ({
+                key: playStyleData.mtg[Number(key)].key,
+                label: playStyleData.mtg[Number(key)].label,
+            }))
+
+            const res = await submitOnboarding({
+                username: username,
+                image: image,
+                bio: bio,
+                playStyles: { mtg: playStylesArray },
+                location: location,
+                playLocation: playLocation,
+            })
+            switch(res.message) {
+                case "success": {
+                    return redirect('/')
+                }
+                case "invalid_username": {
+                    addToast({
+                        color: "danger",
+                        title: "User onboarding",
+                        description: "That username is not allowed."
+                    })
+                    break;
+                } 
+                case "username_already_exists": {
+                    addToast({
+                        color: "danger",
+                        title: "User onboarding",
+                        description: "Username is already taken."
+                    })
+                    break;
+                }
+                default: {
+                    addToast({
+                        color: "danger",
+                        title: "User onboarding",
+                        description: "An unknown error has occured."
+                    })
+                    break;
+                }
             }
+            setIsLoading(false)
         }
     }
 
+    const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (FileReader && e.target.files && e.target.files[0]) {
+            const file = e.target.files[0]
+            if(file.size >= 2 * 1024 * 1024) {
+                addToast({
+                    color: "danger",
+                    title: "User onboarding",
+                    description: "The maximum image size is 2MB."
+                })
+                return;
+            }
+            if(file.type !== "image/jpg" && file.type !== "image/jpeg" && file.type !== "image/png") {
+                addToast({
+                    color: "danger",
+                    title: "User onboarding",
+                    description: "The file you uploaded is not allowed."
+                })
+                return;
+            }
+            const image_url = URL.createObjectURL(e.target.files[0])
+            setImagePreview(image_url)
+            setImage(e.target.files[0])
+        }
+    }
+
+    const handleAddClick = () => {
+        if(hiddenImageInput.current)
+            hiddenImageInput.current.click()
+    }
+
     return (
-        <Card className="w-md p-4 bg-background">
+        <Card className="w-full md:w-xl p-2 md:p-4 bg-background">
             <CardHeader className="">
-                <div className="flex flex-col w-full mx-auto items-center">
-                    <header className="font-bold text-2xl text-foreground">Welcome</header>
-                    <span className="text-foreground/50">Complete your profile information</span>
+                <div className="flex flex-col w-full mx-auto items-center text-center">
+                    <header className="font-bold text-2xl text-foreground">Welcome to the community!</header>
+                    <span className="text-foreground/50">Complete your profile to start looking for friends!</span>
                 </div>
             </CardHeader>
             <CardBody className="flex flex-col gap-6">
                 <Form onSubmit={handleFormSubmit}>
+
+                    {/* Profile Preview */}
+
+                    <div className="flex flex-col sm:flex-row w-full gap-4 p-4 border-1 border-foreground/10 rounded-2xl">
+                        <div onClick={handleAddClick} className="hover:opacity-60 duration-100 aspect-square overflow-hidden mt-0 mb-auto flex rounded-full w-[64px] bg-content2 dark:bg-content1">
+                            {!imagePreview && <RiUserAddFill size={32} className="m-auto"/>}
+                            {imagePreview && <img alt="avatar" className="object-cover w-full h-full" src={imagePreview}/>}
+                        </div>
+                        <div className="flex-1 flex flex-col gap-2">
+                            <div className="flex flex-col">
+                                <span className="font-bold text-lg">{username}</span>
+                                <span className="text-foreground/50 text-sm">
+                                    {bio}
+                                </span>
+                                {location && <span className="text-foreground/50 text-sm my-auto items-center flex flex-row gap-1">
+                                    <RiMapPinFill/> 
+                                    {location}
+                                </span>}
+                                {playLocation && <span className="text-foreground/50 text-sm my-auto items-center flex flex-row gap-1">
+                                    <RiMapFill/> 
+                                    {playLocationsData.filter((item) => item.key === playLocation)[0].label}
+                                </span>}
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                {Array.from(new Set(playStyles)).length != 0 && 
+                                <span className="text-sm">MTG Formats I play:</span>
+                                }
+                                <div className="flex flex-row gap-2 flex-wrap">
+                                    {/* Array.from(playStyles).map((index: number) => (
+                                        <Chip color="primary" key={index}>{playStyleData.mtg[index].label}</Chip>
+                                    )) */}
+                                    {Array.from(new Set(playStyles)).map((key) => (
+                                        <Chip color="primary" key={key.toString()}>{playStyleData.mtg[Number(key)].label}</Chip>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <input ref={hiddenImageInput} onChange={handleImage} type="file" className="hidden"/>
+
                     <Input
+                    size="lg"
                     isRequired
+                    minLength={3}
+                    maxLength={24}
+                    validate={(username) => {
+                        if(username == "") return "Please fill out this field"
+                        if(username.length < 3) return "Username should be at least 3 characters long."
+                        if(!username.match(/^[a-zA-Z0-9_-]+$/)) return "Username can only contain letters, numbers, -, _ and ."
+                    }}
+                    errorMessage={({validationDetails}) => {
+                        if(validationDetails.valueMissing) return "Please fill out this field"
+                        if(username.length < 3) return "Username should be at least 3 characters long."
+                        if(!username.match(/^[a-zA-Z0-9_-]+$/)) return "Username can only contain letters, numbers, -, _ and ."
+                    }}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     name="username"
                     type="username"
                     label="Username"
+                    className="mt-4"
                     />
+
                     <Textarea
+                    size="lg"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
                     placeholder="Write something about yourself"
                     label="Bio"
                     name="bio"
                     minRows={3}
                     maxRows={3}
                     />
+
+                    <Select
+                    size="lg"
+                    isRequired
+                    maxListboxHeight={180}
+                    selectionMode="multiple"
+                    selectedKeys={playStyles}
+                    placeholder="Select all that apply"
+                    onSelectionChange={setPlayStyles}
+                    label="Games and formats played">
+                        <SelectSection className="text-foreground/50" title="Magic the Gathering">
+                            {playStyleData.mtg.map((item, index) => (
+                                <SelectItem className="text-foreground" key={index}>{item.label}</SelectItem>
+                            ))}
+                        </SelectSection>
+                    </Select>
+
                     <Input
-                    label="Play style"
-                    placeholder="e.g. Casual, Competitive, Commander"
-                    />
-                    <Input
+                    size="lg"
+                    isRequired
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                     label="Location"
                     placeholder="City or region"
                     />
-                    <Select label="Preferred play location">
-                        <SelectItem>Local Game Store</SelectItem>
-                        <SelectItem>Home</SelectItem>
-                        <SelectItem>Other</SelectItem>
+
+                    <Select
+                    size="lg"
+                    isRequired
+                    onChange={(e) => setPlayLocation(e.target.value)}
+                    label="Preferred play location">
+                        {playLocationsData.map((item) => (
+                            <SelectItem className="text-foreground" key={item.key}>{item.label}</SelectItem>
+                        ))}
                     </Select>
 
 
-                    <Button type="submit" 
+                    <Button 
+                    type="submit" 
                     className="w-full mt-4" 
                     variant="solid" 
-                    color="primary" size="lg">
+                    color="primary" size="lg" isDisabled={isLoading}>
                         {isLoading ? <Spinner size="sm" color="white"/> : "Continue"}
                     </Button>
                 </Form>

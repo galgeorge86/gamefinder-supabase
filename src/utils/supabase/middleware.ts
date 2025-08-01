@@ -37,6 +37,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Fetch user onboarded bool from public.profiles
+  const {
+    data: profileData,
+  } = await supabase.from("profiles").select('onboarded').eq('user_id', user?.id).single()
+
   if (
     !user &&
     request.nextUrl.pathname != "/" && 
@@ -46,6 +51,17 @@ export async function updateSession(request: NextRequest) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/auth/sign-in'
+    return NextResponse.redirect(url)
+  }
+
+  // If user is signed in but not onboarded, redirect to /user/onboarding
+  if(
+    user && profileData && !profileData?.onboarded
+    && request.nextUrl.pathname != "/user/onboarding"
+    && request.nextUrl.pathname != "/api/user/submit-onboarding"
+  ) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/user/onboarding'
     return NextResponse.redirect(url)
   }
 

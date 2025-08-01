@@ -1,11 +1,31 @@
 import { createClient } from "@/utils/supabase/client"
-import { User } from "@supabase/auth-js"
 import { create } from "zustand"
 import { immer } from "zustand/middleware/immer"
 
 type State = {
     isLoading: boolean
-    user: User | null
+    user: {
+        user_id: string,
+        username: string,
+        bio: string,
+        avatar_url: string,
+        play_styles: {
+            mtg: Array<{
+                key: string, 
+                label: string
+            }> | []
+        },
+        decks: Array<{
+            game: "mtg" | "pokemon" | "yugioh"
+            name: string,
+            url: string,
+        }> | []
+        play_location: string,
+        location: string,
+        onboarded: boolean,
+        created_at: Date,
+        updated_at: Date
+    } | null
 }
 
 type Actions = {
@@ -24,9 +44,10 @@ const useAuthStore = create(
         getUser: async () => {
             const supabase = createClient()
             const {data: {user}} = await supabase.auth.getUser()
+            const {data: userProfile} = await supabase.from("profiles").select('user_id, username, avatar_url, bio, location, play_styles, play_location, decks, created_at, updated_at, onboarded').eq('user_id', user?.id).single()
             set((state) => {
                 state.isLoading = false
-                state.user = user
+                state.user = userProfile
             })
         },
         signOut: async () => {

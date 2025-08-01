@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${outfit.className} dark antialiased`}
+        className={`${outfit.className} dark antialiased bg-background`}
       >
         <Providers>
           {children}
