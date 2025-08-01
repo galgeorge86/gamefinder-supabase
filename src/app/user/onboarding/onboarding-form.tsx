@@ -118,7 +118,7 @@ const OnboardingForm: React.FC = () => {
                     {/* Profile Preview */}
 
                     <div className="flex flex-col sm:flex-row w-full gap-4 p-4 border-1 border-foreground/10 rounded-2xl">
-                        <div onClick={handleAddClick} className="hover:opacity-60 duration-100 aspect-square overflow-hidden mt-0 mb-auto flex rounded-full w-[64px] bg-content2 dark:bg-content1">
+                        <div onClick={handleAddClick} className="mx-auto sm:ml-0 hover:opacity-60 duration-100 aspect-square overflow-hidden mt-0 mb-auto flex rounded-full w-[64px] bg-content2 dark:bg-content1">
                             {!imagePreview && <RiUserAddFill size={32} className="m-auto"/>}
                             {imagePreview && <img alt="avatar" className="object-cover w-full h-full" src={imagePreview}/>}
                         </div>
@@ -137,7 +137,7 @@ const OnboardingForm: React.FC = () => {
                                     {playLocationsData.filter((item) => item.key === playLocation)[0].label}
                                 </span>}
                             </div>
-                            <div className="flex flex-col gap-1">
+                            <div className="sm:flex flex-col gap-1">
                                 {Array.from(new Set(playStyles)).length != 0 && 
                                 <span className="text-sm">MTG Formats I play:</span>
                                 }
@@ -201,7 +201,7 @@ const OnboardingForm: React.FC = () => {
                     label="Games and formats played">
                         <SelectSection className="text-foreground/50" title="Magic the Gathering">
                             {playStyleData.mtg.map((item, index) => (
-                                <SelectItem className="text-foreground" key={index}>{item.label}</SelectItem>
+                                <SelectItem className="text-foreground m-auto p-3" key={index}>{item.label}</SelectItem>
                             ))}
                         </SelectSection>
                     </Select>
@@ -220,9 +220,11 @@ const OnboardingForm: React.FC = () => {
                     isRequired
                     onChange={(e) => setPlayLocation(e.target.value)}
                     label="Preferred play location">
+                        <SelectSection className="text-foreground/50" title="Preferred play location">
                         {playLocationsData.map((item) => (
-                            <SelectItem className="text-foreground" key={item.key}>{item.label}</SelectItem>
+                            <SelectItem className="text-foreground p-3" key={item.key}>{item.label}</SelectItem>
                         ))}
+                        </SelectSection>
                     </Select>
 
 

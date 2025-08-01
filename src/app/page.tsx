@@ -1,11 +1,9 @@
 'use client'
 
 import GeneralLayout from "@/components/layouts/generalLayout";
-import { Button } from "@heroui/react";
-import Image from "next/image";
-import Link from "next/link";
 
 export default function Home() {
+
   return (
     <GeneralLayout>
       <div className="w-full bg-radial m-auto flex flex-col gap-8 text-foreground text-center">
@@ -23,13 +21,6 @@ export default function Home() {
               <span className="text-center items-center w-full m-auto text-foreground/50">...and more to come</span>
             </div>
           </div>
-        </div>
-        <div className="flex flex-row w-full">
-          <Link href={'/auth/sign-up'} className="mx-auto">
-            <Button className="m-auto bg-foreground text-background" radius="full" size="lg">
-              Sign up now!
-            </Button>
-          </Link>
         </div>
       </div>
     </GeneralLayout>

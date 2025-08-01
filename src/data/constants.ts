@@ -1,3 +1,5 @@
+import { RiCalendarFill, RiChat1Fill, RiHome3Fill, RiUser3Fill } from "react-icons/ri"
+
 const playStyleData = {
     mtg: [
         {
@@ -72,4 +74,27 @@ const statusArray = [
     }
 ]
 
-export {playStyleData, playLocationsData, statusArray}
+const tabsArray = [
+    {
+        icon: RiHome3Fill,
+        label: "Home",
+        path: '/'
+    },
+    {
+        icon: RiCalendarFill,
+        label: "Events",
+        path: '/user/events'
+    },
+    {
+        icon: RiChat1Fill,
+        label: "Chat",
+        path: '/user/chat'
+    },
+    {
+        icon: RiUser3Fill,
+        label: "Profile",
+        path: '/user/profile'
+    }
+]
+
+export {playStyleData, playLocationsData, statusArray, tabsArray}

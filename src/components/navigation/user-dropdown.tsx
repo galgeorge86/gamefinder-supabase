@@ -1,7 +1,8 @@
 import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, User } from "@heroui/react"
-import { TbCalendar, TbLogout, TbSettingsFilled, TbUserFilled } from "react-icons/tb"
+import { TbLogout } from "react-icons/tb"
 import { useRouter } from "next/navigation"
 import useAuthStore from "@/stores/authStore"
+import { RiCalendarFill, RiChat1Fill, RiMap2Fill, RiSettings2Fill, RiUser3Fill } from "react-icons/ri"
 
 interface Props {
     name: string,
@@ -34,7 +35,7 @@ const UserDropdown: React.FC<Props> = (props: Props) => {
             src: props.avatarUrl,
             name: props.name,
             className: "bg-foreground text-background transition-transform",
-            getInitials: (name) => props.name.split(' ')[0][0] + name.split(' ')[1][0]
+            getInitials: (name) => name[0]
             }}/>
         </DropdownTrigger>
         <DropdownMenu
@@ -46,12 +47,22 @@ const UserDropdown: React.FC<Props> = (props: Props) => {
         variant="faded">
             <DropdownSection title="Account">
                 <DropdownItem 
-                onPress={() => router.push('/account')}
-                classNames={{base:'p-2'}} startContent={<TbUserFilled size={20}/>} key="profil">My profile</DropdownItem>
-                <DropdownItem classNames={{base:'p-2'}} startContent={<TbSettingsFilled size={20}/>} key="setari">Settings</DropdownItem>
+                onPress={() => router.push('/user/profile')}
+                classNames={{base:'p-2'}} startContent={<RiUser3Fill size={20}/>} key="profile">My profile</DropdownItem>
+                <DropdownItem classNames={{base:'p-2'}} startContent={<RiSettings2Fill size={20}/>} key="settings">Settings</DropdownItem>
             </DropdownSection>
             <DropdownSection title="Events">
-                <DropdownItem classNames={{base:'p-2'}} startContent={<TbCalendar size={20}/>} key="mesaje">Events</DropdownItem>
+                <DropdownItem 
+                onPress={() => router.push('/user/explore')}
+                classNames={{base:'p-2'}} startContent={<RiMap2Fill size={20}/>} key="explore">Explore</DropdownItem>
+
+                <DropdownItem 
+                onPress={() => router.push('/user/events')}
+                classNames={{base:'p-2'}} startContent={<RiCalendarFill size={20}/>} key="events">Events</DropdownItem>
+
+                <DropdownItem 
+                onPress={() => router.push('/user/chat')}
+                classNames={{base:'p-2'}} startContent={<RiChat1Fill size={20}/>} key="chat">Chat</DropdownItem>
             </DropdownSection>
             <DropdownItem classNames={{base:'p-2'}} startContent={<TbLogout size={20}/>} onPress={() => {signOut()}} key="signout" color="danger">
                 Sign Out
