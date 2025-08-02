@@ -70,9 +70,9 @@ export const submitOnboarding = async ({username, image, bio, playStyles, locati
 
         // Handle user onboarding
 
-        const {error} = await supabase.from('profiles').update({
+        const {error: updateError} = await supabase.from('profiles').update({
             'username': username as string,
-            'avatar_url': avatarUrl,
+            'avatar_url': avatarUrl || null,
             'bio': bio as string,
             'location': location as string,
             'play_styles': playStyles,
@@ -81,17 +81,13 @@ export const submitOnboarding = async ({username, image, bio, playStyles, locati
             'updated_at': new Date().toLocaleString()
         }).eq('user_id', user.id)
 
-        if(error) {
-            console.log(error)
-            return {
-                message: "error_updating_user",
-                status: 400
-            }
-        } else {
-            return {
-                message: "success",
-                status: 200
-            }
+        if(updateError) {
+            throw(updateError)
+        } 
+
+        return {
+            message: "success",
+            status: 200
         }
     } catch (e) {
         console.log(e)
