@@ -5,6 +5,8 @@ import useAuthStore from "@/stores/authStore"
 import { RiCalendarFill, RiChat1Fill, RiMap2Fill, RiSettings2Fill, RiUser3Fill } from "react-icons/ri"
 
 interface Props {
+    descriptionColor?: string,
+    description?: string,
     name: string,
     avatarUrl?: string,
 }
@@ -25,9 +27,11 @@ const UserDropdown: React.FC<Props> = (props: Props) => {
             as="button"
             classNames={{
                 base: "flex-row-reverse",
-                name: "text-foreground text-lg",
-                description: "text-foreground/50"
+                wrapper: "flex justify-center my-auto",
+                name: "text-foreground ml-auto mr-0 text-base",
+                description: `text-${props.descriptionColor || "foreground/50"} ml-auto mr-0`
             }}
+            description={props.description}
             className="transition-transform"
             name={props.name.split(' ')[0]}
             avatarProps={{

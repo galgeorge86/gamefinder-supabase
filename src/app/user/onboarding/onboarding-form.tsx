@@ -6,9 +6,6 @@ import { ChangeEvent, FormEvent, useRef, useState } from "react"
 import { redirect } from "next/navigation"
 import { RiMapFill, RiMapPinFill, RiUserAddFill } from "react-icons/ri"
 import { playLocationsData, playStyleData } from "@/data/constants"
-import { submitOnboarding } from "@/actions/user-actions"
-
-
 
 const OnboardingForm: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -33,42 +30,34 @@ const OnboardingForm: React.FC = () => {
                 label: playStyleData.mtg[Number(key)].label,
             }))
 
-            const res = await submitOnboarding({
-                username: username,
-                image: image,
-                bio: bio,
-                playStyles: { mtg: playStylesArray },
-                location: location,
-                playLocation: playLocation,
+            // Initialize FormData to send to API endpoint
+
+            const formData = new FormData()
+            formData.append('username', username)
+            formData.append('bio', bio)
+            formData.append('playStyles', JSON.stringify({mtg: playStylesArray}))
+            formData.append('location', location)
+            formData.append('playLocation', playLocation)
+            if(image) {
+                formData.append('image', image)
+            }
+
+            const res = await fetch('/api/user/submit-onboarding', {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                },
+                body: formData
             })
-            switch(res.message) {
-                case "success": {
-                    return redirect('/')
-                }
-                case "invalid_username": {
-                    addToast({
-                        color: "danger",
-                        title: "User onboarding",
-                        description: "That username is not allowed."
-                    })
-                    break;
-                } 
-                case "username_already_exists": {
-                    addToast({
-                        color: "danger",
-                        title: "User onboarding",
-                        description: "Username is already taken."
-                    })
-                    break;
-                }
-                default: {
-                    addToast({
-                        color: "danger",
-                        title: "User onboarding",
-                        description: "An unknown error has occured."
-                    })
-                    break;
-                }
+            const {message, status} = await res.json()
+            if(status === 200) {
+                return redirect('/')
+            } else {
+                addToast({
+                    color: 'danger',
+                    title: "User onboarding",
+                    description: message
+                })
             }
             setIsLoading(false)
         }
@@ -142,9 +131,6 @@ const OnboardingForm: React.FC = () => {
                                 <span className="text-sm">MTG Formats I play:</span>
                                 }
                                 <div className="flex flex-row gap-2 flex-wrap">
-                                    {/* Array.from(playStyles).map((index: number) => (
-                                        <Chip color="primary" key={index}>{playStyleData.mtg[index].label}</Chip>
-                                    )) */}
                                     {Array.from(new Set(playStyles)).map((key) => (
                                         <Chip color="primary" key={key.toString()}>{playStyleData.mtg[Number(key)].label}</Chip>
                                     ))}

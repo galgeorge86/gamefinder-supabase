@@ -44,11 +44,18 @@ const useAuthStore = create(
         getUser: async () => {
             const supabase = createClient()
             const {data: {user}} = await supabase.auth.getUser()
-            const {data: userProfile} = await supabase.from("profiles").select('user_id, username, avatar_url, bio, location, play_styles, play_location, decks, created_at, updated_at, onboarded').eq('user_id', user?.id).single()
-            set((state) => {
-                state.isLoading = false
-                state.user = userProfile
-            })
+            if(user) {
+                const {data: userProfile} = await supabase.from("profiles").select('user_id, username, avatar_url, bio, location, play_styles, play_location, decks, created_at, updated_at, onboarded').eq('user_id', user?.id).single()
+                set((state) => {
+                    state.isLoading = false
+                    state.user = userProfile
+                })
+            } else {
+                set((state) => {
+                    state.isLoading = false
+                    state.user = initialState.user
+                })
+            }
         },
         signOut: async () => {
             set((state) => {
