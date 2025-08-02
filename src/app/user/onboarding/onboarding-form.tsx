@@ -3,11 +3,14 @@
 import { addToast, Button, Card, CardBody, CardHeader, Chip, Form, Input, Select, SelectItem, SelectSection, SharedSelection, Spinner, Textarea } from "@heroui/react"
 import { ChangeEvent, FormEvent, useRef, useState } from "react"
 
-import { redirect } from "next/navigation"
 import { RiMapFill, RiMapPinFill, RiUserAddFill } from "react-icons/ri"
 import { playLocationsData, playStyleData } from "@/data/constants"
+import { useRouter } from "next/navigation"
 
 const OnboardingForm: React.FC = () => {
+
+    const router = useRouter()
+
     const [isLoading, setIsLoading] = useState(false)
     const [username, setUsername] = useState("")
     const [bio, setBio] = useState("")
@@ -51,7 +54,7 @@ const OnboardingForm: React.FC = () => {
             })
             const {message, status} = await res.json()
             if(status === 200) {
-                return redirect('/')
+                return router.push('/')
             } else {
                 addToast({
                     color: 'danger',
