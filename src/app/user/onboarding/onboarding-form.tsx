@@ -53,8 +53,8 @@ const OnboardingForm: React.FC = () => {
                 body: formData
             })
             const {message, status} = await res.json()
-            if(status === 200) {
-                return router.push('/')
+            if(status == 200) {
+                router.push('/')
             } else {
                 addToast({
                     color: 'danger',

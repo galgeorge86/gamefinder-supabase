@@ -29,7 +29,7 @@ export default function GeneralLayout(
                 transition={{duration: 0.2}}
                 className="w-screen fixed z-20 bg-background items-center h-dvh flex">
                     <div className="flex m-auto flex-col gap-4">
-                        <span className="text-2xl font-bold text-foreground">CardFinder</span>
+                        <span className="text-2xl font-bold text-foreground">GameFinder</span>
                         <Spinner size="lg" color="white"/>
                     </div>
                 </motion.div>}
