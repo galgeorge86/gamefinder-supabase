@@ -5,11 +5,9 @@ import { ChangeEvent, FormEvent, useRef, useState } from "react"
 
 import { RiMapFill, RiMapPinFill, RiUserAddFill } from "react-icons/ri"
 import { playLocationsData, playStyleData } from "@/data/constants"
-import { useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 
 const OnboardingForm: React.FC = () => {
-
-    const router = useRouter()
 
     const [isLoading, setIsLoading] = useState(false)
     const [username, setUsername] = useState("")
@@ -53,16 +51,17 @@ const OnboardingForm: React.FC = () => {
                 body: formData
             })
             const {message, status} = await res.json()
-            if(status == 200) {
-                router.push('/')
-            } else {
+            if(status !== 200) {
                 addToast({
                     color: 'danger',
                     title: "User onboarding",
                     description: message
                 })
+                setIsLoading(false)
+                return;
             }
             setIsLoading(false)
+            return redirect('/')
         }
     }
 

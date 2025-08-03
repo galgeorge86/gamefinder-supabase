@@ -37,11 +37,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Fetch user onboarded bool from public.profiles
-  const {
-    data: profileData,
-  } = await supabase.from("profiles").select('onboarded').eq('user_id', user?.id).single()
-
   if (
     !user &&
     request.nextUrl.pathname != "/" && 
@@ -54,14 +49,41 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // If user is logged in, do not allow sign in or sign up
+  if(
+    user
+    && (request.nextUrl.pathname.startsWith("/auth/sign-in")
+    || request.nextUrl.pathname.startsWith('/auth/sign-up')
+    || request.nextUrl.pathname.startsWith('/auth/verify-email'))
+  ) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    return NextResponse.redirect(url)
+  }
+
+  // Fetch user onboarded bool from public.profiles
+  const {
+    data: profileData,
+  } = await supabase.from("profiles").select('onboarded').eq('user_id', user?.id).single()
+
   // If user is signed in but not onboarded, redirect to /user/onboarding
   if(
     user && profileData && !profileData?.onboarded
-    && request.nextUrl.pathname != "/user/onboarding"
-    && request.nextUrl.pathname != "/api/user/submit-onboarding"
+    && !request.nextUrl.pathname.startsWith("/user/onboarding")
+    && !request.nextUrl.pathname.startsWith("/api/user/submit-onboarding")
   ) {
     const url = request.nextUrl.clone()
     url.pathname = '/user/onboarding'
+    return NextResponse.redirect(url)
+  }
+
+  // If user has onboarded, do not allow onboarding again.
+  if(
+    user && profileData && profileData.onboarded
+    && request.nextUrl.pathname.startsWith("/user/onboarding")
+  ) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
     return NextResponse.redirect(url)
   }
 

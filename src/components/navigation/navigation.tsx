@@ -8,6 +8,7 @@ import { tabsArray } from "@/data/constants"
 import { usePathname } from "next/navigation"
 import { RiMap2Fill, RiMapPin2Fill } from "react-icons/ri"
 import { useState } from "react"
+import useLocationStore from "@/stores/locationStore"
 
 const Navigation: React.FC = () => {
 
@@ -15,6 +16,7 @@ const Navigation: React.FC = () => {
     const [locationState, setLocationState] = useState(false)
 
     const {isLoading, user } = useAuthStore()
+    const {setActive, setInactive} = useLocationStore()
 
     return (
         <div className="fixed z-10 left-0 right-0 top-0 h-[64px] flex w-full items-center bg-background/70 backdrop-blur-lg border-b-1 border-foreground/5">
@@ -76,7 +78,14 @@ const Navigation: React.FC = () => {
                     <UserDropdown description={locationState ? "Active" : "Inactive"} name={user.username} avatarUrl={user.avatar_url}/>
                     <Switch size="lg"
                     isSelected={locationState} 
-                    onValueChange={setLocationState} 
+                    onValueChange={(e) => {
+                        setLocationState(e)
+                        if(e) {
+                            setActive()
+                        } else {
+                            setInactive()
+                        }
+                    }} 
                     color="success"
                     thumbIcon={<RiMapPin2Fill/>}/>
                 </div>

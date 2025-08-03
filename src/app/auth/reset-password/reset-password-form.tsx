@@ -62,7 +62,7 @@ const ResetPasswordForm: React.FC = () => {
                 default: {
                     addToast({
                         color: "danger",
-                        title: "Sign up error",
+                        title: "Password reset error",
                         description: "An uknown error has occured."
                     })
                     break;

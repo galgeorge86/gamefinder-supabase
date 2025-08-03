@@ -24,12 +24,12 @@ export const TabsNavigation: React.FC = () => {
             transition={{duration: 0.1}}
             className="lg:hidden fixed z-10 left-0 right-0 bottom-0 max-h-[128px] w-full bg-background/70 backdrop-blur-lg py-2 px-4 flex flex-row justify-between gap-4 border-t-1 border-foreground/10">
                 <Link
-                href="/users/explore"
-                className="absolute -top-1/2 left-1/2 -translate-x-1/2 p-4 shadow-xl shadow-primary/50 rounded-full bg-primary text-white flex flex-row">
+                href="/user/explore"
+                className={`${pathname.startsWith('/user/explore') ? 'hidden' : 'flex'} absolute -top-1/2 left-1/2 -translate-x-1/2 p-4 shadow-xl shadow-primary/50 rounded-full bg-primary text-white flex-row`}>
                     <RiMap2Fill size={24}/>
                 </Link>
                 {tabsArray.map((tab) => {
-                    if(pathname === tab.path)
+                    if((pathname.startsWith(tab.path) && tab.path !== '/') || pathname === tab.path)
                         return (
                             <div
                             key={tab.label} className={`text-primary items-center p-2 w-full gap-1 rounded-xl`}>
