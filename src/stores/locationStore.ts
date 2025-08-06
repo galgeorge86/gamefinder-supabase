@@ -54,6 +54,7 @@ const initialState: State = {
 }
 
 interface Actions {
+    getLocation: () => void,
     setActive: () => void,
     setInactive: () => void
 }
@@ -61,6 +62,20 @@ interface Actions {
 const useLocationStore = create(
     immer<State & Actions>((set) => ({
         ...initialState,
+        getLocation: async () => {
+            if('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(({coords}) => {
+                    const {latitude, longitude} = coords
+                    set((state) => {
+                        state.isLoading = false
+                        state.location = {
+                            lat: latitude,
+                            long: longitude,
+                        }
+                    })
+                })
+            }
+        },
         setActive: async () => {
             if('geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(({coords}) => {

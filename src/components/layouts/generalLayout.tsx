@@ -6,16 +6,21 @@ import TabsNavigation from "../navigation/tabs-navigation";
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Spinner } from "@heroui/react";
+import useLocationStore from "@/stores/locationStore";
 
 export default function GeneralLayout(
     {children}: Readonly<{children: React.ReactNode}>
 ) {
 
     const {getUser, isLoading} = useAuthStore()
+    const {getLocation} = useLocationStore()
+
     
     useEffect(() => {
+        getLocation()
         if(isLoading)
-        getUser()
+            getUser()
+        
     })
 
     return (
@@ -30,7 +35,7 @@ export default function GeneralLayout(
                 className="w-screen fixed z-20 bg-background items-center h-dvh flex">
                     <div className="flex m-auto flex-col gap-4">
                         <span className="text-2xl font-bold text-foreground">GameFinder</span>
-                        <Spinner size="lg" color="white"/>
+                        <Spinner size="lg" color="primary"/>
                     </div>
                 </motion.div>}
             </AnimatePresence>

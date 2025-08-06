@@ -1,22 +1,20 @@
 'use client'
 
-import { Button, Switch } from "@heroui/react"
+import { Button } from "@heroui/react"
 import Link from "next/link"
 import UserDropdown from "./user-dropdown"
 import useAuthStore from "@/stores/authStore"
 import { tabsArray } from "@/data/constants"
 import { usePathname } from "next/navigation"
-import { RiMap2Fill, RiMapPin2Fill } from "react-icons/ri"
-import { useState } from "react"
+import { RiMap2Fill } from "react-icons/ri"
 import useLocationStore from "@/stores/locationStore"
 
 const Navigation: React.FC = () => {
 
     const pathname = usePathname()
-    const [locationState, setLocationState] = useState(false)
 
     const {isLoading, user } = useAuthStore()
-    const {setActive, setInactive} = useLocationStore()
+    const {location} = useLocationStore()
 
     return (
         <div className="fixed z-10 left-0 right-0 top-0 h-[64px] flex w-full items-center bg-background/70 backdrop-blur-lg border-b-1 border-foreground/5">
@@ -48,7 +46,8 @@ const Navigation: React.FC = () => {
                         <Button
                         startContent={<RiMap2Fill size={20}/>}
                         radius="full"
-                        className="p-2 px-4 bg-primary">
+                        color="primary"
+                        className="p-2 px-4">
                             <span className="text-sm">Explore</span>
                         </Button>
                     </Link>
@@ -75,8 +74,20 @@ const Navigation: React.FC = () => {
                 {!isLoading && user &&
                 <div
                 className="flex flex-row gap-2 w-fit">
-                    <UserDropdown description={locationState ? "Active" : "Inactive"} name={user.username} avatarUrl={user.avatar_url}/>
-                    <Switch size="lg"
+                    <UserDropdown description={location ? "Active" : "Inactive"} name={user.username} avatarUrl={user.avatar_url}/>
+                </div>
+                }
+                
+            </header>
+        </div>
+    )
+}
+
+export default Navigation
+
+/* 
+
+<Switch size="lg"
                     isSelected={locationState} 
                     onValueChange={(e) => {
                         setLocationState(e)
@@ -88,12 +99,5 @@ const Navigation: React.FC = () => {
                     }} 
                     color="success"
                     thumbIcon={<RiMapPin2Fill/>}/>
-                </div>
-                }
-                
-            </header>
-        </div>
-    )
-}
 
-export default Navigation
+*/

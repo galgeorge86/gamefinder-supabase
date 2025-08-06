@@ -5,9 +5,12 @@ import { ChangeEvent, FormEvent, useRef, useState } from "react"
 
 import { RiMapFill, RiMapPinFill, RiUserAddFill } from "react-icons/ri"
 import { playLocationsData, playStyleData } from "@/data/constants"
-import { redirect } from "next/navigation"
 
-const OnboardingForm: React.FC = () => {
+interface Props {
+    onSuccess: (username: string) => void
+}
+
+const OnboardingForm: React.FC<Props> = (props: Props) => {
 
     const [isLoading, setIsLoading] = useState(false)
     const [username, setUsername] = useState("")
@@ -61,7 +64,7 @@ const OnboardingForm: React.FC = () => {
                 return;
             }
             setIsLoading(false)
-            return redirect('/')
+            props.onSuccess(username)
         }
     }
 

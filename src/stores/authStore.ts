@@ -2,9 +2,7 @@ import { createClient } from "@/utils/supabase/client"
 import { create } from "zustand"
 import { immer } from "zustand/middleware/immer"
 
-type State = {
-    isLoading: boolean
-    user: {
+export type User = {
         user_id: string,
         username: string,
         bio: string,
@@ -25,7 +23,11 @@ type State = {
         onboarded: boolean,
         created_at: Date,
         updated_at: Date
-    } | null
+} | null
+
+type State = {
+    isLoading: boolean
+    user: User
 }
 
 type Actions = {
