@@ -43,7 +43,7 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
 
     const list = useAsyncList<GeocodingFeature>({
         async load({signal, filterText}) {
-            const res = await geocode.forward(filterText!, {signal: signal, autocomplete: true, permanent: true})
+            const res = await geocode.forward(filterText!, {signal: signal, autocomplete: true})
             return {
                 items: res.features || null
             }

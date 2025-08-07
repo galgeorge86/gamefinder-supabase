@@ -70,7 +70,6 @@ const MapSection: React.FC = () => {
             <Map
             {...viewState}
             onMove={evt => setViewState(evt.viewState)}
-            style={{width: 'screen', height:'screen', position:'absolute', left: 0, right: 0, top: 0, bottom: 0}}
             mapboxAccessToken={accessToken}
             mapStyle={"mapbox://styles/galgeorge86/cmdvucxci00dr01pj6uwkhrhi"}
             maxZoom={20}

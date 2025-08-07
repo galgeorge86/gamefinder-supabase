@@ -30,6 +30,14 @@ const SignInForm: React.FC = () => {
 
                     return redirect(`/auth/verify-email?email=${email}`)
                 }
+                case "user_banned": {
+                    addToast({
+                        color: 'danger',
+                        title: "Sign in error",
+                        description: "You have been banned from using the service."
+                    })
+                    break;
+                }
                 case "invalid_credentials": {
                     addToast({
                         color: 'danger',
