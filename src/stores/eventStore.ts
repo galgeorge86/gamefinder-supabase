@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { createClient } from "@/utils/supabase/client";
 
+
+// TODO: Fix supabase returning host as array, expected to return single object
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export type Event = {
     id: string,
@@ -47,6 +49,9 @@ const useEventStore = create(
     immer<State & Actions>((set) => ({
         ...initialState,
         getEvents: async () => {
+            set((state) => {
+                state.isLoading = true
+            })
             const supabase = await createClient()
             const {data: events} = await supabase.from("events").select(`
                 id,
@@ -82,14 +87,13 @@ const useEventStore = create(
                     state.isLoading = false
                 })
             }
-            
         },
         clearEvents: () => {
             set((state) => {
-                state.events = [],
+                state.events = []
                 state.isLoading = false
             })
-        }
+        },
     }))
 )
 

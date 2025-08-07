@@ -147,8 +147,7 @@ const signOut = async () => {
 
     await supabase.auth.signOut()
     
-    revalidatePath('/')
-    redirect('/', RedirectType.push)
+    return redirect('/', RedirectType.push)
 }
 
 export {signUp, verifyOTP, signIn, signOut, forgotPassword, resetPassword}

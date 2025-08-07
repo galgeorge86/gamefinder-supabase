@@ -1,4 +1,5 @@
 'use client'
+
 import { playStyleData } from "@/data/constants"
 import { addToast, Autocomplete, AutocompleteItem, Button, DatePicker, Form, Input, Select, SelectItem, Slider, Spinner, Textarea } from "@heroui/react"
 import { getLocalTimeZone, now, parseAbsoluteToLocal, ZonedDateTime } from "@internationalized/date";
@@ -7,6 +8,7 @@ import { FormEvent, useState } from "react";
 import { GeocodingFeature } from "@mapbox/search-js-core";
 import { useAsyncList } from "@react-stately/data";
 import { addEvent } from "@/actions/event-actions";
+import useEventStore from "@/stores/eventStore";
 
 
 interface Props {
@@ -37,9 +39,11 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
 
     const [isLoading, setIsLoading] = useState(false)
 
+    const {getEvents} = useEventStore()
+
     const list = useAsyncList<GeocodingFeature>({
         async load({signal, filterText}) {
-            const res = await geocode.forward(filterText!, {autocomplete: true})
+            const res = await geocode.forward(filterText!, {signal: signal, autocomplete: true, permanent: true})
             return {
                 items: res.features || null
             }
@@ -82,7 +86,8 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
                     title: 'Add event',
                     description: res.message
                 })
-                props.onClose
+                getEvents()
+                props.onClose()
             }
         }
     }
@@ -188,7 +193,6 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
             />
             
             <DatePicker size="lg"
-            className="max-w-md"
             granularity="minute"
             description="Event must start at least an hour from now."
             minValue={startingDate || parseAbsoluteToLocal(now(getLocalTimeZone()).add({hours: 1}).toAbsoluteString())}
@@ -197,7 +201,6 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
             label="Starts at:"
             />
             <DatePicker size="lg"
-            className="max-w-md"
             granularity="minute"
             description="Event must be at least an hour long."
             minValue={startingDate?.add({hours: 1}) || parseAbsoluteToLocal(now(getLocalTimeZone()).add({hours: 2}).toAbsoluteString())}

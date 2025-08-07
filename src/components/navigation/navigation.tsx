@@ -8,6 +8,7 @@ import { tabsArray } from "@/data/constants"
 import { usePathname } from "next/navigation"
 import { RiMap2Fill } from "react-icons/ri"
 import useLocationStore from "@/stores/locationStore"
+import Notifications from "./notifications"
 
 const Navigation: React.FC = () => {
 
@@ -75,6 +76,7 @@ const Navigation: React.FC = () => {
                 <div
                 className="flex flex-row gap-2 w-fit">
                     <UserDropdown description={location ? "Active" : "Inactive"} name={user.username} avatarUrl={user.avatar_url}/>
+                    <Notifications/>
                 </div>
                 }
                 

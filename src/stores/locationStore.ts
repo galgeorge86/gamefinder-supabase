@@ -66,6 +66,7 @@ const useLocationStore = create(
             if('geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(({coords}) => {
                     const {latitude, longitude} = coords
+                    console.log(coords)
                     set((state) => {
                         state.isLoading = false
                         state.location = {

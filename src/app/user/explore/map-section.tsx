@@ -5,13 +5,13 @@ import useLocationStore from "@/stores/locationStore"
 import { Avatar, Badge, Button, Card, CardBody, Chip, Drawer, DrawerBody, DrawerContent, DrawerHeader, useDisclosure } from "@heroui/react"
 import useAuthStore from "@/stores/authStore"
 import { TbLocationOff } from 'react-icons/tb'
-import { RiAddFill, RiUserAddFill } from 'react-icons/ri'
-import { useEffect} from 'react'
-import useEventStore from '@/stores/eventStore'
+import { RiAddFill } from 'react-icons/ri'
+import { useEffect, useState} from 'react'
+import useEventStore, { Event } from '@/stores/eventStore'
 import { Outfit } from 'next/font/google'
 
+//Force client, required for the useGeocodingCore hook (otherwise it throws 'document is undefined' error)
 import dynamic from 'next/dynamic';
-
 const AddEventForm = dynamic(() => import('./add-event-form.tsx'), { ssr: false });
 
 
@@ -26,15 +26,32 @@ const MapSection: React.FC = () => {
 
     const { location } = useLocationStore()
     const { user } = useAuthStore()
-
     const {events, getEvents, isLoading} = useEventStore()
-
     const {isOpen, onOpen, onOpenChange} = useDisclosure()
 
+    const [openEvent, setOpenEvent] = useState<Event | null>()
+
+    const {isOpen: isOpenEvent, onOpen: onOpenEvent, onOpenChange: onOpenChangeEvent} = useDisclosure()
+
+    const [viewState, setViewState] = useState({
+        longitude: 0,
+        latitude: 0,
+        zoom: 3.5
+    });
+
+    // TODO: Add controlled zoom and custom event markers based on zoom (full card when zoomed-in / bubble when zoomed out)
+
+    // Get events
     useEffect(() => {
+        if(viewState.latitude == 0 || viewState.longitude == 0)
+            setViewState({
+                longitude: location?.long || 0,
+                latitude: location?.lat || 0,
+                zoom: 3.5
+            })
         if(isLoading)
             getEvents()
-    })
+    }, [isLoading])
 
     if(!location) {
         return (
@@ -51,53 +68,58 @@ const MapSection: React.FC = () => {
     if(location) {
         return (
             <Map
-            initialViewState={{
-                longitude: location?.long,
-                latitude: location?.lat,
-                zoom: 11
-            }}
+            {...viewState}
+            onMove={evt => setViewState(evt.viewState)}
             style={{width: 'screen', height:'screen', position:'absolute', left: 0, right: 0, top: 0, bottom: 0}}
             mapboxAccessToken={accessToken}
             mapStyle={"mapbox://styles/galgeorge86/cmdvucxci00dr01pj6uwkhrhi"}
             maxZoom={20}
             >
                 {/* Player Marker */}
-
                 {location && <Marker className="flex flex-col items-center" latitude={location.lat || 0} longitude={location.long}>
                         <Badge className='w-4 h-4 p-0' color='success'>
                             <Avatar src={user?.avatar_url}></Avatar>
                         </Badge>
                     </Marker>}
 
-                {/* Events Marker */}
-
+                {/* Event Markers */}
                 {!isLoading && events && events.map((event) => {
                     return (
-                        <Marker key={event.id} className={outfit.className} latitude={event.latitude} longitude={event.longitude}>
-                            <Card>
+                        <Marker key={event.id} className={`${outfit.className}`} latitude={event.latitude} longitude={event.longitude}>
+                            {viewState.zoom > 13 && <Card className={`border-warning border-2 overflow-visible w-[180px]`}>
+                                <Chip className='absolute left-1/2 -translate-x-1/2 -top-4' color='warning' size='sm'>MTG</Chip>
                                 <CardBody className='flex flex-col gap-2'>
                                     <div className='flex flex-row gap-2'>
                                         <Avatar src={event.host.avatar_url} name={event.host.username}/>
-                                        <div className='flex flex-col'>
+                                        <div className='flex flex-col w-2/3'>
                                             <span className='font-bold'>{event.title}</span>
                                             <span className='text-foreground/50'>Hosted by: {event.host.username!}</span>
+                                            <span className='text-foreground/50 line-clamp-3'>{event.description}</span>
                                         </div>
                                     </div>
-                                    <div className='flex flex-row gap-1'>
-                                        <Chip color='warning' size='sm'>MTG</Chip>
-                                        <Chip color='primary' size='sm'>{event.format.label}</Chip>
+                                    <div className='flex flex-row gap-1 w-full'>
+                                        <Chip color='default' size='sm' variant='dot'>{event.format.label}</Chip>
                                     </div>
                                     <div className='w-full'>
-                                        <Button 
-                                        startContent={<RiUserAddFill/>} 
+                                        <Button
+                                        onPress={() => {
+                                            setOpenEvent(event)
+                                            onOpenEvent()
+                                        }}
                                         size='sm' 
                                         className='w-full'
                                         color='primary'>
-                                            Join now
+                                            View more
                                         </Button>
                                     </div>
                                 </CardBody>
-                            </Card>
+                            </Card>}
+                            {viewState.zoom < 13 && 
+                            <div className='relative p-2 px-4 rounded-full bg-content1 text-foreground border-warning border-2'>
+                                <Chip className='absolute left-1/2 -translate-x-1/2 -top-4' color='warning' size='sm'>MTG</Chip>
+                                <span>{event.format.label}</span>
+                            </div>
+                            }
                         </Marker>
                     )
                 })}
@@ -125,9 +147,23 @@ const MapSection: React.FC = () => {
                                 <span className='text-2xl font-bold'>Host an event</span>
                             </DrawerHeader>
                             <DrawerBody>
-                                {document && 
                                 <AddEventForm onClose={onClose}/>
-                                }
+                            </DrawerBody>
+                            </>
+                        )}
+                    </DrawerContent>
+                </Drawer>
+
+                <Drawer size='lg' radius='lg' classNames={{
+                    base: "h-[100vh] bg-background",
+                }} className='text-foreground' placement="right" backdrop="transparent" isOpen={isOpenEvent} onOpenChange={onOpenChangeEvent}>
+                    <DrawerContent>
+                        {() => (
+                            <>
+                            <DrawerHeader>
+                                <span className='text-2xl font-bold'>{openEvent?.title}</span>
+                            </DrawerHeader>
+                            <DrawerBody>
                             </DrawerBody>
                             </>
                         )}
