@@ -96,22 +96,22 @@ const MapSection: React.FC = () => {
                     let chipColor: "default" | "primary" | "warning" | "success" | "danger" = "warning"
 
                     let dateString = ""
-                    if(startingString.includes('in')) {
+                    if(startingString.startsWith('in')) {
                         dateString = "Starting " + startingString
                         chipColor = "success"
                     }
-                    else if (startingString.includes('ago') && endingString.includes('in')) {
-                        dateString = "Ending " + endingString
+                    else if (startingString.endsWith('ago') && endingString.startsWith('in')) {
+                        dateString = "Ongoing, ending " + endingString
                         chipColor = "warning"
                     }
-                    else if (startingString.includes('ago')) {
+                    else if (endingString.endsWith('ago')) {
                         dateString = "Ended " + endingString
                         chipColor = "danger"
                     }
 
                     return (
                         <Marker key={event.id} className={`${outfit.className}`} latitude={event.latitude} longitude={event.longitude}>
-                            {viewState.zoom > 13 && <Card className={`border-warning border-2 overflow-visible w-[180px]`}>
+                            {viewState.zoom > 13 && <Card className={`border-warning border-2 overflow-visible w-[220px]`}>
                                 <Chip className='absolute left-1/2 -translate-x-1/2 -top-4' color='warning' size='sm'>MTG</Chip>
                                 <CardBody className='flex flex-col gap-2'>
                                     <div className='flex flex-row gap-2'>
