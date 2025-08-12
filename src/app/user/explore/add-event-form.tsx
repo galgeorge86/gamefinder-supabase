@@ -54,15 +54,18 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(title, description, maximumPlayers, startingDate, endingDate, format, coords)
         if(title && maximumPlayers && startingDate && endingDate && format && coords) {
             setIsLoading(true)
+
+            const startingUTC = new Date(startingDate.toAbsoluteString())
+            const endingUTC = new Date(endingDate.toAbsoluteString())
+
             const res = await addEvent({
                 title: title as string,
                 description: description as string,
                 maximumPlayers: maximumPlayers as number,
-                startDate: startingDate.toDate(),
-                endDate: endingDate.toDate(),
+                startDate: startingUTC,
+                endDate: endingUTC,
                 game: "mtg",
                 format: format,
                 fullAddress: fullAddress,
@@ -217,7 +220,7 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
             placeholder="e.g. House rules, location information, amenities, what to bring etc."/>
 
             <Button isDisabled={isLoading} type="submit" className="w-full" size="lg" color="primary">
-                {isLoading ? <Spinner color="white"/> : "Host event" }
+                {isLoading ? <Spinner size="sm" color="white"/> : "Host event" }
             </Button>
             <Button isDisabled={isLoading} onPress={props.onClose} className="w-full" size="lg" variant="bordered" color="default">
                 Cancel

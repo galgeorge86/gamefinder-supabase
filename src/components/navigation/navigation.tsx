@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from "@heroui/react"
+import { Badge, Button } from "@heroui/react"
 import Link from "next/link"
 import UserDropdown from "./user-dropdown"
 import useAuthStore from "@/stores/authStore"

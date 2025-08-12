@@ -1,4 +1,4 @@
-import { RiCalendarFill, RiChat1Fill, RiHome3Fill, RiUser3Fill } from "react-icons/ri"
+import { RiCalendarFill, RiChat1Fill, RiHome3Fill, RiInformation2Fill, RiMap2Fill, RiNotification3Fill, RiUser3Fill } from "react-icons/ri"
 
 const playStyleData = {
     mtg: [
@@ -97,4 +97,23 @@ const tabsArray = [
     }
 ]
 
-export {playStyleData, playLocationsData, statusArray, tabsArray}
+const notificationTypes = {
+    default: {
+        key: "default",
+        icon: RiNotification3Fill
+    },
+    event: {
+        key: "event",
+        icon: RiMap2Fill
+    },
+    chat: {
+        key: "chat",
+        icon: RiChat1Fill
+    },
+    info: {
+        key: "info",
+        icon: RiInformation2Fill
+    }
+}
+
+export {playStyleData, playLocationsData, statusArray, tabsArray, notificationTypes}

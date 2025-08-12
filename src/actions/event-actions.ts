@@ -29,7 +29,7 @@ export const addEvent = async ({
     startDate: Date,
     endDate: Date,
     maximumPlayers: number,
-    description: string,
+    description: string | null,
     game: "mtg",
     format: {
         key: string,
@@ -92,6 +92,42 @@ export const addEvent = async ({
         console.log(e)
         return {
             message: "An unknown error occured.",
+            status: 500
+        }
+    }
+}
+
+export const getEvent = async ({id}: {id: string}) => {
+    const supabase = await createClient()
+    const event =  await supabase.from("events").select(`
+            id,
+            title,
+            description,
+            start_date,
+            end_date,
+            latitude,
+            longitude,
+            game,
+            format,
+            maximum_players,
+            place,
+            region,
+            country,
+            postal_code,
+            address,
+            full_address,
+            created_at,
+            updated_at,
+            host:profiles (user_id, avatar_url, username)
+        `).eq('id', id).single()
+    if(event) {
+        return({
+            event: event,
+            status: 200
+        })
+    } else {
+        return {
+            message: "The event was not found",
             status: 500
         }
     }

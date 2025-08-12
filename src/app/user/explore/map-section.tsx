@@ -9,11 +9,14 @@ import { RiAddFill } from 'react-icons/ri'
 import { useEffect, useState} from 'react'
 import useEventStore, { Event } from '@/stores/eventStore'
 import { Outfit } from 'next/font/google'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en.json'
 
 //Force client, required for the useGeocodingCore hook (otherwise it throws 'document is undefined' error)
 import dynamic from 'next/dynamic';
 const AddEventForm = dynamic(() => import('./add-event-form.tsx'), { ssr: false });
 
+TimeAgo.addDefaultLocale(en)
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -23,6 +26,8 @@ const outfit = Outfit({
 const MapSection: React.FC = () => {
 
     const accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
+
+    const timeAgo = new TimeAgo('en-US')
 
     const { location } = useLocationStore()
     const { user } = useAuthStore()
@@ -83,6 +88,27 @@ const MapSection: React.FC = () => {
 
                 {/* Event Markers */}
                 {!isLoading && events && events.map((event) => {
+                    //const starting = fromDate(event.start_date, getLocalTimeZone())
+                    //const dateNow = now(getLocalTimeZone()) 
+                    const startingString = timeAgo.format(new Date(event.start_date))
+                    const endingString = timeAgo.format(new Date(event.end_date))
+
+                    let chipColor: "default" | "primary" | "warning" | "success" | "danger" = "warning"
+
+                    let dateString = ""
+                    if(startingString.includes('in')) {
+                        dateString = "Starting " + startingString
+                        chipColor = "success"
+                    }
+                    else if (startingString.includes('ago') && endingString.includes('in')) {
+                        dateString = "Ending " + endingString
+                        chipColor = "warning"
+                    }
+                    else if (startingString.includes('ago')) {
+                        dateString = "Ended " + endingString
+                        chipColor = "danger"
+                    }
+
                     return (
                         <Marker key={event.id} className={`${outfit.className}`} latitude={event.latitude} longitude={event.longitude}>
                             {viewState.zoom > 13 && <Card className={`border-warning border-2 overflow-visible w-[180px]`}>
@@ -96,8 +122,9 @@ const MapSection: React.FC = () => {
                                             <span className='text-foreground/50 line-clamp-3'>{event.description}</span>
                                         </div>
                                     </div>
-                                    <div className='flex flex-row gap-1 w-full'>
+                                    <div className='flex flex-col gap-1 w-full'>
                                         <Chip color='default' size='sm' variant='dot'>{event.format.label}</Chip>
+                                        <Chip variant='dot' classNames={{content: 'line-clamp-1'}} color={chipColor} size='sm'>{dateString}</Chip>
                                     </div>
                                     <div className='w-full'>
                                         <Button
@@ -111,6 +138,7 @@ const MapSection: React.FC = () => {
                                             View more
                                         </Button>
                                     </div>
+                                    
                                 </CardBody>
                             </Card>}
                             {viewState.zoom < 13 && 
