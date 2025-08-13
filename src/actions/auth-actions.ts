@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from "@/utils/supabase/server"
-import { revalidatePath } from "next/cache"
 import { redirect, RedirectType } from "next/navigation"
 
 const signUp = async ({email, password}: {email: string, password: string}) => {

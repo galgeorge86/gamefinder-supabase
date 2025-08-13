@@ -1,5 +1,5 @@
 import useNotificationStore from "@/stores/notificationStore"
-import { Avatar, Badge, Button, Divider, Popover, PopoverContent, PopoverTrigger, Spinner } from "@heroui/react"
+import { Avatar, Badge, Button, Popover, PopoverContent, PopoverTrigger, Spinner } from "@heroui/react"
 import { useEffect } from "react"
 import {  RiNotification3Fill } from "react-icons/ri"
 
@@ -41,18 +41,15 @@ const Notifications: React.FC = () => {
                 </div>
             </div>
             }
-            {notifications.toReversed().map((notification, index) => {
+            {notifications.toReversed().map((notification) => {
                 return (
-                    <>
-                    <button key={notification.id} className="text-left hover:ring-1 ring-content2 duration-150 rounded-lg flex flex-row gap-2 w-full p-2">
-                        {notification.host && <Avatar size="md" className="my-auto w-fit aspect-square" src={notification.host.avatar_url}/>}
+                    <button key={notification.id} className="text-left hover:bg-content1 hover:ring-1 ring-content2 duration-150 rounded-lg flex flex-row gap-2 w-full p-2">
+                        {notification.host && <Avatar size="md" name={notification.host.username} className="my-auto w-fit aspect-square" src={notification.host.avatar_url}/>}
                             <div className="flex flex-col w-4/5">
                                 <span className="my-auto text-foreground">{notification.title}</span>
-                                <span className="text-xs text-foreground/50 line-clamp-1">{notification.description}</span>
+                                <span className="text-xs text-foreground/50 line-clamp-2">{notification.description}</span>
                             </div>
                     </button>
-                    {index < notifications.length - 1 && <Divider/>}
-                    </>
                 )
             })}
         </PopoverContent>
@@ -61,3 +58,11 @@ const Notifications: React.FC = () => {
 }
 
 export default Notifications
+
+/* 
+
+
+                    {index < notifications.length - 1 && <Divider/>}
+                    </>
+
+*/

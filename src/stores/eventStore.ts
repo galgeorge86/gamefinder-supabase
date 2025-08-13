@@ -30,6 +30,13 @@ export type Event = {
     updated_at: Date,
 }
 
+export type DetailedEvent = {
+    event: Event,
+    joined: boolean,
+    users: any[],
+    room_id: string | null,
+}
+
 type State = {
     isLoading: boolean
     events: Array<Event>

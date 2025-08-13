@@ -14,6 +14,7 @@ import en from 'javascript-time-ago/locale/en.json'
 
 //Force client, required for the useGeocodingCore hook (otherwise it throws 'document is undefined' error)
 import dynamic from 'next/dynamic';
+import EventDetails from './event-details.tsx'
 const AddEventForm = dynamic(() => import('./add-event-form.tsx'), { ssr: false });
 
 TimeAgo.addDefaultLocale(en)
@@ -41,7 +42,7 @@ const MapSection: React.FC = () => {
     const [viewState, setViewState] = useState({
         longitude: 0,
         latitude: 0,
-        zoom: 3.5
+        zoom: 14.5
     });
 
     // TODO: Add controlled zoom and custom event markers based on zoom (full card when zoomed-in / bubble when zoomed out)
@@ -52,7 +53,7 @@ const MapSection: React.FC = () => {
             setViewState({
                 longitude: location?.long || 0,
                 latitude: location?.lat || 0,
-                zoom: 3.5
+                zoom: 14.5
             })
         if(isLoading)
             getEvents()
@@ -183,14 +184,15 @@ const MapSection: React.FC = () => {
 
                 <Drawer size='lg' radius='lg' classNames={{
                     base: "h-[100vh] bg-background",
+                    closeButton:'top-2 right-2'
                 }} className='text-foreground' placement="right" backdrop="transparent" isOpen={isOpenEvent} onOpenChange={onOpenChangeEvent}>
                     <DrawerContent>
                         {() => (
                             <>
                             <DrawerHeader>
-                                <span className='text-2xl font-bold'>{openEvent?.title}</span>
                             </DrawerHeader>
                             <DrawerBody>
+                                {openEvent && <EventDetails id={openEvent.id}/>}
                             </DrawerBody>
                             </>
                         )}
