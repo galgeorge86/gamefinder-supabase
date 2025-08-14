@@ -181,8 +181,8 @@ export const joinEvent = async ({event_id}: {event_id: string}) => {
                 status: 401
             }
         }
-        const {data: event} = await supabase.from('events').select('maximum_players').eq('event_id', event_id).single()
-        const {data: eventUsers} = await supabase.from("events_players").select().eq('event_id', event_id)
+        const {data: event} = await supabase.from('events').select('maximum_players').eq('id', event_id).single()
+        const {data: eventUsers} = await supabase.from("events_players").select('id').eq('event_id', event_id)
         if(event && eventUsers && eventUsers.length < event.maximum_players) {
             const {error} = await supabase.from("events_players").insert({
                 event_id: event_id,
