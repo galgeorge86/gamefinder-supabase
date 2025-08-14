@@ -1,12 +1,17 @@
+'use client'
 import useNotificationStore from "@/stores/notificationStore"
-import { Avatar, Badge, Button, Popover, PopoverContent, PopoverTrigger, Spinner } from "@heroui/react"
+import { Avatar, Badge, Button, Popover, PopoverContent, PopoverTrigger, ScrollShadow, Spinner } from "@heroui/react"
 import { useEffect } from "react"
 import {  RiNotification3Fill } from "react-icons/ri"
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en.json'
+TimeAgo.addLocale(en)
 
 
 const Notifications: React.FC = () => {
 
     const {isLoading, notifications, getNotifications} = useNotificationStore()
+    const timeAgo = new TimeAgo('en-US')
 
     useEffect(() => {
         getNotifications()
@@ -29,8 +34,8 @@ const Notifications: React.FC = () => {
         </PopoverTrigger>
         </Badge>
         <PopoverContent
-        
-        className="text-foreground w-[280px] p-4 gap-2">
+        className="text-foreground w-[300px] p-4 gap-2 h-[50vh]">
+            <ScrollShadow className="flex flex-col gap-2 mt-0 mb-auto">
             {isLoading && <Spinner size="sm" color="primary" className="m-auto"/>}
             {!isLoading && notifications.length === 0 &&
             <div className="flex flex-row gap-2 p-4 w-full">
@@ -43,15 +48,20 @@ const Notifications: React.FC = () => {
             }
             {notifications.toReversed().map((notification) => {
                 return (
-                    <button key={notification.id} className="text-left hover:bg-content1 hover:ring-1 ring-content2 duration-150 rounded-lg flex flex-row gap-2 w-full p-2">
+                    <button key={notification.id} className="text-left rounded-lg flex flex-row gap-2 w-full p-2">
                         {notification.host && <Avatar size="md" name={notification.host.username} className="my-auto w-fit aspect-square" src={notification.host.avatar_url}/>}
                             <div className="flex flex-col w-4/5">
-                                <span className="my-auto text-foreground">{notification.title}</span>
+                                <div className="flex flex-row justify-between">
+                                    <span className="my-auto text-foreground line-clamp-1">{notification.title}</span>
+                                    
+                                </div>
                                 <span className="text-xs text-foreground/50 line-clamp-2">{notification.description}</span>
+                                <span className="text-foreground/50 text-left ml-0 mr-auto text-xs">{timeAgo.format(new Date(notification.created_at))}</span>
                             </div>
                     </button>
                 )
             })}
+            </ScrollShadow>
         </PopoverContent>
     </Popover>
     )

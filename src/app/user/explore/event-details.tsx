@@ -1,11 +1,12 @@
+'use client'
 import { getEvent, joinEvent, leaveEvent } from "@/actions/event-actions"
 import useAuthStore from "@/stores/authStore"
 import useNotificationStore from "@/stores/notificationStore"
 import { dateFormatted } from "@/utils/dateFormatting"
-import { addToast, Avatar, Badge, Button, Chip, Popover, PopoverContent, PopoverTrigger, Spinner, User } from "@heroui/react"
+import { addToast, Avatar, Badge, Button, Chip, Popover, PopoverContent, PopoverTrigger, Spinner } from "@heroui/react"
 import { useMutation } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
-import { RiClipboardFill, RiMapPin2Fill } from "react-icons/ri"
+import { RiClipboardFill, RiMap2Fill, RiMapPin2Fill } from "react-icons/ri"
 import { TbArrowRight } from "react-icons/tb"
 
 interface Props {
@@ -104,19 +105,13 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                 <div className="flex flex-col gap-2 p-4 rounded-xl border-1 border-content2">
                     <span className="text-foreground/50">Hosted by:</span>
                     <div className="flex flex-row justify-between">
-                        <User
-                        classNames={{
-                            base: 'ml-0 mr-auto w-full',
-                            name: 'text-foreground font-semibold text-base w-4/5',
-                            description: 'text-foreground/50 text-sm w-4/5'
-                        }}
-                        name={data.event.event.host.username}
-                        description={data.event.event.host.bio}
-                        avatarProps={{
-                            name: data.event.event.host.username,
-                            src: data.event.event.host.avatar_url, 
-                            className: ''
-                        }}/>
+                        <div className="flex w-full gap-2">
+                            <Avatar size="md" name={data.event.event.host.username} className="my-auto w-fit aspect-square" src={data.event.event.host.avatar_url}/>
+                            <div className="flex flex-col w-4/5">
+                                <span className="my-auto font-semibold text-base text-foreground">{data.event.event.host.username}</span>
+                                <span className="text-sm text-foreground/50 line-clamp-2">{data.event.event.host.bio}</span>
+                            </div>
+                        </div>
                         <Button color="primary" className="my-auto">View profile</Button>
                     </div>
                 </div>
@@ -131,7 +126,7 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                     </div>
                     <div className="flex flex-col">
                         <div className="flex flex-row gap-1 text-foreground/50">
-                            <RiMapPin2Fill className="my-auto"/>
+                            <RiMap2Fill className="my-auto"/>
                             <span className="text-nowrap">Place, region, country:</span>
                         </div>
                         <span className="text-foreground">{data.event.event.place || "N/a"}, {data.event.event.region || "N/a"}, {data.event.event.country || "N/a"}</span>
@@ -203,15 +198,13 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                                         </PopoverTrigger>
                                     </Badge>
                                         <PopoverContent className="p-4 gap-4 flex flex-col">
-                                            <User
-                                            classNames={{
-                                                base: 'ml-0 mr-auto',
-                                                name: 'text-foreground',
-                                                description: 'text-foreground/50'
-                                            }}
-                                            name={player.username}
-                                            description={player.bio}
-                                            avatarProps={{name: player.username, src: player.avatar_url, className: 'w-[68px]'}}/>
+                                            <div className="flex w-full gap-2">
+                                                <Avatar size="md" name={player.username} className="my-auto w-fit aspect-square" src={player.avatar_url}/>
+                                                <div className="flex flex-col w-3/5">
+                                                    <span className="my-auto text-sm text-foreground">{player.username}</span>
+                                                    <span className="text-xs text-foreground/50 line-clamp-3">{player.bio}</span>
+                                                </div>
+                                            </div>
                                             <Button className="w-full" size="sm" color="primary">View profile</Button>
                                         </PopoverContent>
                                     </Popover>
@@ -223,22 +216,20 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                                             <Avatar size="lg" src={player.avatar_url} name={player.username} isBordered className="text-xl"/>
                                         </PopoverTrigger>
                                         <PopoverContent className="p-4 gap-4 flex flex-col">
-                                            <User
-                                            classNames={{
-                                                base: 'ml-0 mr-auto',
-                                                name: 'text-foreground',
-                                                description: 'text-foreground/50'
-                                            }}
-                                            name={player.username}
-                                            description={player.bio}
-                                            avatarProps={{name: player.username, src: player.avatar_url, className: 'w-[68px]'}}/>
+                                            <div className="flex w-full gap-2">
+                                                <Avatar size="md" name={player.username} className="my-auto w-fit aspect-square" src={player.avatar_url}/>
+                                                <div className="flex flex-col w-3/5">
+                                                    <span className="my-auto text-sm text-foreground">{player.username}</span>
+                                                    <span className="text-xs text-foreground/50 line-clamp-3">{player.bio}</span>
+                                                </div>
+                                            </div>
                                             <div className="flex flex-col gap-2 w-full">
-                                            <Button className="w-full" size="sm" color="primary">View profile</Button>
-                                            {user && user.user_id === data.event.event.host.user_id && 
-                                            <Button color="danger" size="sm" className="text-white w-full">
-                                                Kick player
-                                            </Button>
-                                            }
+                                                <Button className="w-full" size="sm" color="primary">View profile</Button>
+                                                {user && user.user_id === data.event.event.host.user_id && 
+                                                <Button color="danger" size="sm" className="text-white w-full">
+                                                    Kick player
+                                                </Button>
+                                                }
                                             </div>
                                         </PopoverContent>
                                     </Popover>
@@ -252,7 +243,7 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col mb-0 mt-8">
+                <div className="flex flex-col mb-24 mt-4">
                     {data.event.joined && (!user || user.user_id !== data.event.event.host.user_id) &&
                     <Button 
                     size="lg"

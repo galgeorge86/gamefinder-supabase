@@ -17,7 +17,7 @@ import dynamic from 'next/dynamic';
 import EventDetails from './event-details.tsx'
 const AddEventForm = dynamic(() => import('./add-event-form.tsx'), { ssr: false });
 
-TimeAgo.addDefaultLocale(en)
+TimeAgo.addLocale(en)
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -42,7 +42,7 @@ const MapSection: React.FC = () => {
     const [viewState, setViewState] = useState({
         longitude: 0,
         latitude: 0,
-        zoom: 14.5
+        zoom: 11.5
     });
 
     // TODO: Add controlled zoom and custom event markers based on zoom (full card when zoomed-in / bubble when zoomed out)
@@ -53,7 +53,7 @@ const MapSection: React.FC = () => {
             setViewState({
                 longitude: location?.long || 0,
                 latitude: location?.lat || 0,
-                zoom: 14.5
+                zoom: 11.5
             })
         if(isLoading)
             getEvents()
