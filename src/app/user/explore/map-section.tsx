@@ -265,14 +265,12 @@ const MapSection: React.FC = () => {
 
                 <div className={`${outfit.className} absolute flex flex-row gap-2 justify-between left-1/2 -translate-x-1/2 w-screen xl:w-[1280px] p-2 top-[64px]`}>
                     <div className='w-fit flex flex-row gap-2 h-fit p-2 bg-background/50 rounded-full backdrop-blur-lg border-1 border-foreground/10'>
-                        <Button 
-                        size='lg'
+                        <Button
                         onPress={() => onOpenFilters()}
                         className='my-auto' radius='full' color='primary'>Filters</Button>
                     </div>
                     <div className='w-fit flex flex-row gap-2 h-fit p-2 bg-background/50 rounded-full backdrop-blur-lg border-1 border-foreground/10'>
-                        <Button radius='full' 
-                        size='lg'
+                        <Button radius='full'
                         onPress={() => onOpen()}
                         color='primary'
                         startContent={<RiAddFill size={24}/>}>Host</Button>
@@ -282,7 +280,7 @@ const MapSection: React.FC = () => {
                 {!isLoadingStatus && <div className={`${outfit.className} absolute flex flex-row gap-2 left-1/2 -translate-x-1/2 w-screen xl:w-[1280px] p-2 bottom-[24px]`}>
                     <div className='w-fit max-w-md mx-auto flex flex-col gap-2 h-fit p-2 bg-background/50 rounded-2xl backdrop-blur-lg border-1 border-foreground/10'>
                         {!current && 
-                        <Button size='lg' 
+                        <Button 
                         onPress={() => onOpenStatus()}
                         color='primary'
                         startContent={<RiScan2Fill size={24}/>}>
@@ -294,12 +292,12 @@ const MapSection: React.FC = () => {
                             onPress={() => {
                                 toggleActive(!current.active)
                             }}
-                            className='w-[90%]' size='lg' color={current.active ? "success" : "default"}>
+                            className='w-[90%]' color={current.active ? "success" : "default"}>
                                 Looking For: {current.active ? "Active" : "Inactive"}
                             </Button>
                             <Button 
                             onPress={() => onOpenStatus()}
-                            isIconOnly size='lg' variant='faded' color="default" startContent={<RiEdit2Fill size={20}/>}/>
+                            isIconOnly variant='faded' color="default" startContent={<RiEdit2Fill size={20}/>}/>
                         </div>
                         }
                         <span className='text-foreground/50 text-center px-8'>An active status means your location is shared in real-time with other players. Turn it off when you don&apos;t want to show up on the map</span>

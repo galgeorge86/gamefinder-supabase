@@ -1,4 +1,4 @@
-import { getActivePlayers, getCurrent, toggleActiveStatus } from "@/actions/looking-for-actions"
+import { getActivePlayers, getCurrent, toggleActiveStatus, updateUserLocation } from "@/actions/looking-for-actions"
 import { createClient } from "@/utils/supabase/client"
 import { create } from "zustand"
 import { immer } from "zustand/middleware/immer"
@@ -137,16 +137,16 @@ export const useLookingForStore = create(
                                     longitude: longitude
                                 }
                             })
+                            updateUserLocation({
+                                latitude: latitude,
+                                longitude: longitude
+                            })
                         }
                         state.location = {
                             latitude: latitude,
                             longitude: longitude,
                         }
                     })
-                    /*await updateUserLocation({
-                        latitude: latitude,
-                        longitude: longitude
-                    })*/
                 })
             }
         },
