@@ -1,10 +1,11 @@
 'use client'
 
-import { addToast, Button, Card, CardBody, CardHeader, Chip, Form, Input, Select, SelectItem, SelectSection, SharedSelection, Spinner, Textarea } from "@heroui/react"
+import { addToast, Button, Card, CardBody, CardHeader, Checkbox, CheckboxGroup, Chip, Form, Input, Select, SelectItem, SelectSection, Spinner, Tab, Tabs, Textarea } from "@heroui/react"
 import { ChangeEvent, FormEvent, useRef, useState } from "react"
 
 import { RiMapFill, RiMapPinFill, RiUserAddFill } from "react-icons/ri"
 import { playLocationsData, playStyleData } from "@/data/constants"
+import { submitOnboarding } from "@/actions/user-actions"
 
 interface Props {
     onSuccess: (username: string) => void
@@ -22,38 +23,28 @@ const OnboardingForm: React.FC<Props> = (props: Props) => {
     const [image, setImage] = useState<File>()
     const [imagePreview, setImagePreview] = useState("")
 
-    const [playStyles, setPlayStyles] = useState<SharedSelection>()
+    const [mtgFormats, setMTGFormats] = useState<string[]>([])
+    const [pokemonFormats, setPokemonFormats] = useState<string[]>([])
+    const [yugiohFormats, setYugiohFormats] = useState<string[]>([])
+    const [otherFormats, setOtherFormats] = useState<string[]>([])
 
     const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if(username && location && playLocation && playStyles) { // bio and image are not mandatory
+        if(username && location && playLocation) { // bio and image are not mandatory
             setIsLoading(true)
-            const playStylesArray = Array.from(new Set(playStyles)).map((key) => ({
-                key: playStyleData.mtg[Number(key)].key,
-                label: playStyleData.mtg[Number(key)].label,
-            }))
 
-            // Initialize FormData to send to API endpoint
-
-            const formData = new FormData()
-            formData.append('username', username)
-            formData.append('bio', bio)
-            formData.append('playStyles', JSON.stringify({mtg: playStylesArray}))
-            formData.append('location', location)
-            formData.append('playLocation', playLocation)
-            if(image) {
-                formData.append('image', image)
-            }
-
-            const res = await fetch('/api/user/submit-onboarding', {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                },
-                body: formData
+            const {message, status} = await submitOnboarding({
+                username: username,
+                bio: bio,
+                location: location,
+                image: image,
+                mtg_formats: mtgFormats,
+                pokemon_formats: pokemonFormats,
+                yugioh_formats: yugiohFormats,
+                other_formats: otherFormats,
+                play_location: playLocation
             })
-            const {message, status} = await res.json()
             if(status !== 200) {
                 addToast({
                     color: 'danger',
@@ -132,14 +123,39 @@ const OnboardingForm: React.FC<Props> = (props: Props) => {
                                 </span>}
                             </div>
                             <div className="sm:flex flex-col gap-1">
-                                {Array.from(new Set(playStyles)).length != 0 && 
-                                <span className="text-sm">MTG Formats I play:</span>
+                                {mtgFormats.length != 0 && 
+                                <span className="text-sm">Magic: The Gathering</span>
                                 }
                                 <div className="flex flex-row gap-2 flex-wrap">
-                                    {Array.from(new Set(playStyles)).map((key) => (
-                                        <Chip color="primary" key={key.toString()}>{playStyleData.mtg[Number(key)].label}</Chip>
+                                    {mtgFormats.map((key) => (
+                                        <Chip color="warning" key={key.toString()}>{playStyleData.mtg.filter(item => item.key === key)[0].label}</Chip>
                                     ))}
                                 </div>
+                                {pokemonFormats.length != 0 && 
+                                <span className="text-sm">Pokemon</span>
+                                }
+                                <div className="flex flex-row gap-2 flex-wrap">
+                                    {pokemonFormats.map((key) => (
+                                        <Chip color="primary" key={key}>{playStyleData.pokemon.filter(item => item.key === key)[0].label}</Chip>
+                                    ))}
+                                </div>
+                                {yugiohFormats.length != 0 && 
+                                <span className="text-sm">Yu-Gi-Oh!</span>
+                                }
+                                <div className="flex flex-row gap-2 flex-wrap">
+                                    {yugiohFormats.map((key) => (
+                                        <Chip color="success" key={key}>{playStyleData.yugioh.filter(item => item.key === key)[0].label}</Chip>
+                                    ))}
+                                </div>
+                                {otherFormats.length != 0 && 
+                                <span className="text-sm">Other</span>
+                                }
+                                <div className="flex flex-row gap-2 flex-wrap">
+                                    {otherFormats.map((key) => (
+                                        <Chip color="secondary" key={key}>{playStyleData.other.filter(item => item.key === key)[0].label}</Chip>
+                                    ))}
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -155,12 +171,12 @@ const OnboardingForm: React.FC<Props> = (props: Props) => {
                     validate={(username) => {
                         if(username == "") return "Please fill out this field"
                         if(username.length < 3) return "Username should be at least 3 characters long."
-                        if(!username.match(/^[a-zA-Z0-9_-]+$/)) return "Username can only contain letters, numbers, -, _ and ."
+                        if(!username.match(/^[a-zA-Z0-9_.-]+$/)) return "Username can only contain letters, numbers, -, _ and ."
                     }}
                     errorMessage={({validationDetails}) => {
                         if(validationDetails.valueMissing) return "Please fill out this field"
                         if(username.length < 3) return "Username should be at least 3 characters long."
-                        if(!username.match(/^[a-zA-Z0-9_-]+$/)) return "Username can only contain letters, numbers, -, _ and ."
+                        if(!username.match(/^[a-zA-Z0-9_.-]+$/)) return "Username can only contain letters, numbers, -, _ and ."
                     }}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -180,22 +196,94 @@ const OnboardingForm: React.FC<Props> = (props: Props) => {
                     minRows={3}
                     maxRows={3}
                     />
-
-                    <Select
-                    size="lg"
-                    isRequired
-                    maxListboxHeight={180}
-                    selectionMode="multiple"
-                    selectedKeys={playStyles}
-                    placeholder="Select all that apply"
-                    onSelectionChange={setPlayStyles}
-                    label="Games and formats played">
-                        <SelectSection className="text-foreground/50" title="Magic the Gathering">
-                            {playStyleData.mtg.map((item, index) => (
-                                <SelectItem className="text-foreground m-auto p-3" key={index}>{item.label}</SelectItem>
+                    <Tabs classNames={{
+                        base: "w-full",
+                        tabList: "w-full items-center"
+                    }}>
+                        <Tab title="MTG" className="w-full">
+                            <CheckboxGroup classNames={{
+                                wrapper: "flex flex-row"
+                            }}
+                            value={mtgFormats}
+                            onValueChange={(e) => {
+                                setMTGFormats(e)
+                            }}>
+                            {playStyleData.mtg.map((item) => (
+                                <Checkbox classNames={{
+                                    base:
+                                    `w-full flex flex-row-reverse m-0 bg-background border-divider items-center
+                                    cursor-pointer rounded-xl gap-4 p-2 border-2
+                                    duration-100
+                                    data-[selected=true]:bg-warning data-[selected=true]:border-transparent`,
+                                    wrapper: "hidden"
+                                }} value={item.key} key={item.key} className="">{item.label}</Checkbox>
                             ))}
-                        </SelectSection>
-                    </Select>
+                            </CheckboxGroup>
+                        </Tab>
+                        <Tab title="Pokemon" className="w-full">
+                            <CheckboxGroup classNames={{
+                                wrapper: "flex flex-row"
+                            }}
+                            value={pokemonFormats}
+                            onValueChange={(e) => {
+                                setPokemonFormats(e)
+                            }}>
+                            {playStyleData.pokemon.map((item) => (
+                                <Checkbox classNames={{
+                                    base:
+                                    `w-full flex flex-row-reverse m-0 bg-background border-divider items-center
+                                    cursor-pointer rounded-xl gap-4 p-2 border-2
+                                    duration-100
+                                    data-[selected=true]:bg-primary data-[selected=true]:border-transparent`,
+                                    wrapper: "hidden"
+                                }} value={item.key} key={item.key} className="">{item.label}</Checkbox>
+                            ))}
+                            </CheckboxGroup>
+                        </Tab>
+                        <Tab title="YGO" className="w-full">
+                            <CheckboxGroup classNames={{
+                                wrapper: "flex flex-row"
+                            }}
+                            value={yugiohFormats}
+                            onValueChange={(e) => {
+                                setYugiohFormats(e)
+                            }}
+                            >
+                            {playStyleData.yugioh.map((item) => (
+                                <Checkbox classNames={{
+                                    base:
+                                    `w-full flex flex-row-reverse m-0 bg-background border-divider items-center
+                                    cursor-pointer rounded-xl gap-4 p-2 border-2
+                                    duration-100
+                                    data-[selected=true]:bg-success data-[selected=true]:border-transparent`,
+                                    wrapper: "hidden"
+                                }} value={item.key} key={item.key} className="">{item.label}</Checkbox>
+                            ))}
+                            </CheckboxGroup>
+                        </Tab>
+                        <Tab title="Other" className="w-full">
+                            <CheckboxGroup classNames={{
+                                wrapper: "flex flex-row"
+                            }}
+                            value={otherFormats}
+                            onValueChange={(e) => {
+                                setOtherFormats(e)
+                            }}>
+                            {playStyleData.other.map((item) => (
+                                <Checkbox classNames={{
+                                    base:
+                                    `w-full flex flex-row-reverse m-0 bg-background border-divider items-center
+                                    cursor-pointer rounded-xl gap-4 p-2 border-2
+                                    duration-100
+                                    data-[selected=true]:bg-default data-[selected=true]:border-transparent`,
+                                    wrapper: "hidden"
+                                }} value={item.key} key={item.key} className="">{item.label}</Checkbox>
+                            ))}
+                            </CheckboxGroup>
+                        </Tab>
+                    </Tabs>
+
+                    
 
                     <Input
                     size="lg"
@@ -233,3 +321,33 @@ const OnboardingForm: React.FC<Props> = (props: Props) => {
 }
 
 export default OnboardingForm
+
+/* 
+
+<Select
+                    size="lg"
+                    isRequired
+                    maxListboxHeight={180}
+                    selectionMode="multiple"
+                    selectedKeys={playStyles}
+                    placeholder="Select all that apply"
+                    onSelectionChange={setPlayStyles}
+                    label="Games and formats played">
+                        <SelectSection className="text-foreground/50" title="Magic the Gathering">
+                            {playStyleData.mtg.map((item, index) => (
+                                <SelectItem className="text-foreground m-auto p-3" key={index}>{item.label}</SelectItem>
+                            ))}
+                        </SelectSection>
+                        <SelectSection className="text-foreground/50" title="Pokemon">
+                            {playStyleData.mtg.map((item, index) => (
+                                <SelectItem className="text-foreground m-auto p-3" key={index}>{item.label}</SelectItem>
+                            ))}
+                        </SelectSection>
+                        <SelectSection className="text-foreground/50" title="Yu-Gi-Oh">
+                            {playStyleData.mtg.map((item, index) => (
+                                <SelectItem className="text-foreground m-auto p-3" key={index}>{item.label}</SelectItem>
+                            ))}
+                        </SelectSection>
+                    </Select>
+
+*/

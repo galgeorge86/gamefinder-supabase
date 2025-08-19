@@ -31,7 +31,7 @@ export const addEvent = async ({
     endDate: Date,
     maximumPlayers: number,
     description: string | null,
-    game: "mtg",
+    game: "mtg" | "pokemon" | "yugioh" | "other",
     format: {
         key: string,
         label: string

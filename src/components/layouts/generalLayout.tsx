@@ -6,21 +6,16 @@ import TabsNavigation from "../navigation/tabs-navigation";
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Spinner } from "@heroui/react";
-import useLocationStore from "@/stores/locationStore";
 
 export default function GeneralLayout(
     {children}: Readonly<{children: React.ReactNode}>
 ) {
 
     const {getUser, isLoading} = useAuthStore()
-    const {getLocation} = useLocationStore()
 
-    
     useEffect(() => {
-        getLocation()
         if(isLoading)
             getUser()
-        
     })
 
     return (

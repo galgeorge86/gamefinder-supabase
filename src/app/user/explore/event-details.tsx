@@ -3,14 +3,14 @@ import { getEvent, joinEvent, leaveEvent } from "@/actions/event-actions"
 import useAuthStore from "@/stores/authStore"
 import useNotificationStore from "@/stores/notificationStore"
 import { dateFormatted } from "@/utils/dateFormatting"
-import { addToast, Avatar, Badge, Button, Chip, Popover, PopoverContent, PopoverTrigger, Spinner } from "@heroui/react"
+import { addToast, Avatar, Badge, Button, Divider, Popover, PopoverContent, PopoverTrigger, Slider, Spinner, Tab, Tabs } from "@heroui/react"
 import { useMutation } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { RiClipboardFill, RiMap2Fill, RiMapPin2Fill } from "react-icons/ri"
-import { TbArrowRight } from "react-icons/tb"
 
 interface Props {
     id: string,
+    onClose: () => void
 }
 
 const EventDetails: React.FC<Props> = (props: Props) => {
@@ -91,22 +91,115 @@ const EventDetails: React.FC<Props> = (props: Props) => {
     )
 
     if(!isPending && data && data.event) {
+        if (new Date(data.event.event.end_date).getTime() < Date.now()) {
+            if (data.event.joined) {
+                return (
+                    <div className="flex flex-col w-full gap-8 m-auto">
+                        <div className="flex flex-col text-center">
+                            <span className="text-xl font-bold text-foreground">Review the players!</span>
+                            <span className="text-foreground/50">How was playing with these people?</span>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                        <Tabs classNames={{
+                            base: 'w-full',
+                            tabList: 'w-full',
+                            panel: 'mt-0'
+                        }}>
+                            {data.event.users.map((player) => {
+                                if(player && user && player.user_id != user?.user_id) {
+                                    return (
+                                        <Tab key={player.username} title={player.username}
+                                        className="flex flex-col gap-4 w-full">
+                                            <div className="flex w-full gap-4">
+                                                
+                                                {data.event.event.host.user_id === player.user_id ?
+                                                <Badge color="warning" content="Host">
+                                                    <Avatar size="md" isBordered color="warning" name={player.username} className="my-auto w-fit aspect-square" src={player.avatar_url}/>
+                                                </Badge>
+                                                :
+                                                <Avatar size="md" isBordered name={player.username} className="my-auto w-fit aspect-square" src={player.avatar_url}/>
+                                                }
+                                                <div className="flex flex-col w-4/5">
+                                                    <span className="my-auto font-semibold text-base text-foreground">{player.username}</span>
+                                                    <span className="text-sm text-foreground/50 line-clamp-1">{player.bio}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <Slider
+                                                size="sm"
+                                                showSteps
+                                                showOutline
+                                                defaultValue={3}
+                                                label="Fun"
+                                                step={0.5}
+                                                minValue={1}
+                                                maxValue={5}/>
+                                                <Slider
+                                                size="sm"
+                                                showSteps
+                                                showOutline
+                                                defaultValue={3}
+                                                label="Friendliness"
+                                                step={0.5}
+                                                minValue={1}
+                                                maxValue={5}/>
+                                                <Slider
+                                                size="sm"
+                                                showSteps
+                                                showOutline
+                                                defaultValue={3}
+                                                label="Skill"
+                                                step={0.5}
+                                                minValue={1}
+                                                maxValue={5}/>
+                                                </div>
+                                        </Tab>
+                                    )
+                                }
+                            })}
+                        </Tabs>
+                        </div>
+                        
+                        <div className="flex flex-col gap-2">
+                            <Button
+                            color="primary"
+                            onPress={() => props.onClose()}
+                            size="lg">
+                                Submit rating
+                            </Button>
+                            <Button
+                            onPress={() => props.onClose()}
+                            size="lg">
+                                Close
+                            </Button>
+                        </div>
+                    </div>
+                )
+            } else {
+                return (
+                    <div className="flex flex-col w-full gap-8 m-auto">
+                        <div className="flex flex-col text-center">
+                            <span className="text-xl font-bold text-foreground">This event has already ended :(</span>
+                            <span className="text-foreground/50">Look around for upcoming events!</span>
+                        </div>
+                        <Button
+                        onPress={() => props.onClose()}
+                        size="lg">
+                            Close
+                        </Button>
+                    </div>
+                )
+            }
+        }
         
         return (
             <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                    <span className="text-3xl font-bold text-foreground">{data.event.event.title}</span>
-                    <div className="flex flex-row gap-1">
-                        <span>Tags:&nbsp;</span>
-                        <Chip color="warning">MTG</Chip>
-                        <Chip color="primary">{data.event.event.format.label}</Chip>
-                    </div>
-                </div>
+                
                 <div className="flex flex-col gap-2 p-4 rounded-xl border-1 border-content2">
                     <span className="text-foreground/50">Hosted by:</span>
                     <div className="flex flex-row justify-between">
                         <div className="flex w-full gap-2">
-                            <Avatar size="md" name={data.event.event.host.username} className="my-auto w-fit aspect-square" src={data.event.event.host.avatar_url}/>
+                            <Avatar size="md" name={data.event.event.host.username} className="my-auto w-[40px] aspect-square" src={data.event.event.host.avatar_url}/>
                             <div className="flex flex-col w-4/5">
                                 <span className="my-auto font-semibold text-base text-foreground">{data.event.event.host.username}</span>
                                 <span className="text-sm text-foreground/50 line-clamp-2">{data.event.event.host.bio}</span>
@@ -114,6 +207,10 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                         </div>
                         <Button color="primary" className="my-auto">View profile</Button>
                     </div>
+                    <span className="text-foreground/50">Event details:</span>
+                    <div className="p-4 flex flex-col bg-content2 rounded-2xl">
+                            <span className="whitespace-pre-line">{data.event.event.description || "The host has not provided any details."}</span>
+                        </div>
                 </div>
 
                 <div className="flex flex-col gap-2 p-4 rounded-xl border-1 border-content2">
@@ -152,18 +249,18 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                         <span className="text-nowrap text-foreground/50">Starting:</span>
                         <span className="text-foreground">{dateFormatted(data.event.event.start_date.toLocaleString())}</span>
                     </div>
-                    <TbArrowRight className="my-auto" size={20}/>
                     <div className="flex flex-col p-4 rounded-xl border-1 border-content2 w-1/2">
                         <span className="text-nowrap text-foreground/50">Ending:</span>
                         <span className="text-foreground">{dateFormatted(data.event.event.end_date.toLocaleString())}</span>
                     </div>
                 </div>
-                <div className="flex flex-col gap-4">
-                    <div className="flex flex-row justify-between">
+                <Divider/>
+                <div className="flex flex-col gap-4 w-full">
+                    <div className="flex flex-row gap-4 mx-auto">
                         <span>Participating players:</span>
                         <span>{data.event.users.filter((user) => user !== null).length}/{data.event.event.maximum_players}</span>
                     </div>
-                    <div className="flex flex-row flex-wrap gap-4">
+                    <div className={`grid grid-cols-${data.event.event.maximum_players < 6 ? data.event.event.maximum_players : '6'} gap-4 items-center mx-auto`}>
                         {data.event.users.map((player, index) => {
                             if(player === null) {
                                 return(
@@ -199,7 +296,7 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                                     </Badge>
                                         <PopoverContent className="p-4 gap-4 flex flex-col">
                                             <div className="flex w-full gap-2">
-                                                <Avatar size="md" name={player.username} className="my-auto w-fit aspect-square" src={player.avatar_url}/>
+                                                <Avatar size="md" name={player.username} className="my-auto w-[40px] aspect-square" src={player.avatar_url}/>
                                                 <div className="flex flex-col w-3/5">
                                                     <span className="my-auto text-sm text-foreground">{player.username}</span>
                                                     <span className="text-xs text-foreground/50 line-clamp-3">{player.bio}</span>
@@ -217,7 +314,7 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                                         </PopoverTrigger>
                                         <PopoverContent className="p-4 gap-4 flex flex-col">
                                             <div className="flex w-full gap-2">
-                                                <Avatar size="md" name={player.username} className="my-auto w-fit aspect-square" src={player.avatar_url}/>
+                                                <Avatar size="md" name={player.username} className="my-auto w-[40px] aspect-square" src={player.avatar_url}/>
                                                 <div className="flex flex-col w-3/5">
                                                     <span className="my-auto text-sm text-foreground">{player.username}</span>
                                                     <span className="text-xs text-foreground/50 line-clamp-3">{player.bio}</span>
@@ -236,14 +333,8 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                                 )
                         })}
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <span>Event details:</span>
-                        <div className="p-4 bg-content2 rounded-2xl">
-                            <span className="whitespace-pre">{data.event.event.description || "The host has not provided any details."}</span>
-                        </div>
-                    </div>
                 </div>
-                <div className="flex flex-col mb-24 mt-4">
+                <div className="flex flex-col mb-24 mt-4 gap-4">
                     {data.event.joined && (!user || user.user_id !== data.event.event.host.user_id) &&
                     <Button 
                     size="lg"
@@ -268,6 +359,9 @@ const EventDetails: React.FC<Props> = (props: Props) => {
                         Cancel event
                     </Button>
                     }
+                    <Button onPress={() => props.onClose()} color="default" size="lg" className="text-white">
+                        Close
+                    </Button>
                 </div>
             </div>
         )
@@ -275,3 +369,59 @@ const EventDetails: React.FC<Props> = (props: Props) => {
 }
 
 export default EventDetails
+
+/* 
+
+<span className="text-3xl font-bold text-foreground">{openEvent.title}</span>
+                                <div className="flex flex-row gap-2">
+                                    <span className={`text-${gamesData[openEvent.game].color}`}>{gamesData[openEvent.game].label}</span>
+                                    <Chip color={gamesData[openEvent.game].color}>{openEvent.format.label}</Chip>
+                                </div>
+
+
+
+<div className="flex flex-col gap-8">
+                            {data.event.users.map((player) => {
+                                if(player && user && player.user_id != user?.user_id) {
+                                    return (
+                                        <div className="flex flex-col gap-4">
+                                            <div className="flex flex-row gap-2 mr-auto">
+                                                <Avatar name={player.username} src={player.avatar_url}/>
+                                                <span className="text-xl font-bold text-foreground my-auto">{player.username}</span>
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <Slider
+                                                size="sm"
+                                                showSteps
+                                                showOutline
+                                                defaultValue={3}
+                                                label="Fun"
+                                                step={0.5}
+                                                minValue={1}
+                                                maxValue={5}/>
+                                                <Slider
+                                                size="sm"
+                                                showSteps
+                                                showOutline
+                                                defaultValue={3}
+                                                label="Friendliness"
+                                                step={0.5}
+                                                minValue={1}
+                                                maxValue={5}/>
+                                                <Slider
+                                                size="sm"
+                                                showSteps
+                                                showOutline
+                                                defaultValue={3}
+                                                label="Skill"
+                                                step={0.5}
+                                                minValue={1}
+                                                maxValue={5}/>
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                            })}
+                        </div>
+
+*/

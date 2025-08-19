@@ -7,15 +7,15 @@ import useAuthStore from "@/stores/authStore"
 import { tabsArray } from "@/data/constants"
 import { usePathname } from "next/navigation"
 import { RiMap2Fill } from "react-icons/ri"
-import useLocationStore from "@/stores/locationStore"
 import Notifications from "./notifications"
+import { useLookingForStore } from "@/stores/lookingForStore"
 
 const Navigation: React.FC = () => {
 
     const pathname = usePathname()
 
     const {isLoading, user } = useAuthStore()
-    const {location} = useLocationStore()
+    const {location} = useLookingForStore()
 
     return (
         <div className="fixed z-10 left-0 right-0 top-0 h-[64px] flex w-full items-center bg-background/70 backdrop-blur-lg border-b-1 border-foreground/5">

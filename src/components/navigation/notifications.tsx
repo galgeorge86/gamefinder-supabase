@@ -49,7 +49,7 @@ const Notifications: React.FC = () => {
             {notifications.toReversed().map((notification) => {
                 return (
                     <button key={notification.id} className="text-left rounded-lg flex flex-row gap-2 w-full p-2">
-                        {notification.host && <Avatar size="md" name={notification.host.username} className="my-auto w-fit aspect-square" src={notification.host.avatar_url}/>}
+                        {notification.host && <Avatar size="md" name={notification.host.username} className="my-auto w-[40px] aspect-square" src={notification.host.avatar_url}/>}
                             <div className="flex flex-col w-4/5">
                                 <div className="flex flex-row justify-between">
                                     <span className="my-auto text-foreground line-clamp-1">{notification.title}</span>

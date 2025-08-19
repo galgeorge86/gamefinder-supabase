@@ -34,7 +34,7 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
     const [country, setCountry] = useState<string>("")
     const [postalCode, setPostalCode] = useState<string>("")
 
-    const [game, setGame] = useState<"mtg">("mtg")
+    const [game, setGame] = useState<"mtg" | "yugioh" | "pokemon" | "other">("mtg")
     const [format, setFormat] = useState<{key: string, label: string}>(playStyleData.mtg[1])
 
     const [isLoading, setIsLoading] = useState(false)
@@ -66,7 +66,7 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
                 maximumPlayers: maximumPlayers as number,
                 startDate: startingUTC,
                 endDate: endingUTC,
-                game: "mtg",
+                game: game,
                 format: format,
                 fullAddress: fullAddress,
                 address: address,
@@ -155,16 +155,17 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
             <div className="flex flex-row w-full gap-2">
                 <Select
                 onSelectionChange={(keys) => {
-                    // TODO: Change to allow other games
-                    if(keys.currentKey === "mtg"){
+                    if(keys.currentKey === "mtg" || keys.currentKey === "pokemon" || keys.currentKey === "yugioh" || keys.currentKey === "other"){
                         setGame(keys.currentKey)
                     }
                 }}
                 isRequired
                 defaultSelectedKeys={[game]}
-                isDisabled
                 label="Game">
-                    <SelectItem key={"mtg"}>Magic: The Gathering</SelectItem>
+                    <SelectItem className="text-foreground py-3" key={"mtg"}>Magic: The Gathering</SelectItem>
+                    <SelectItem className="text-foreground py-3" key={"pokemon"}>Pokemon</SelectItem>
+                    <SelectItem className="text-foreground py-3" key={"yugioh"}>Yu-Gi-Oh!</SelectItem>
+                    <SelectItem className="text-foreground py-3" key={"other"}>Other</SelectItem>
                 </Select>
 
                 <Select
@@ -176,7 +177,7 @@ const AddEventForm: React.FC<Props> = (props: Props) => {
                 defaultSelectedKeys={["commander"]}
                 label="Format">
                     {
-                        playStyleData.mtg.map((item) => (
+                        playStyleData[game].map((item) => (
                             <SelectItem className="text-foreground py-3" key={item.key}>{item.label}</SelectItem>
                         ))
                     }
