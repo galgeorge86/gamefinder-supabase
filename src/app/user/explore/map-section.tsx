@@ -18,6 +18,10 @@ import { useLookingForStore } from '@/stores/lookingForStore.ts'
 //Force client, required for the useGeocodingCore hook (otherwise it throws 'document is undefined' error)
 import dynamic from 'next/dynamic';
 import AddStatusForm from './add-status-form.tsx'
+import { LuMinus } from 'react-icons/lu'
+
+import {AnimatePresence, motion} from 'framer-motion'
+
 const AddEventForm = dynamic(() => import('./add-event-form.tsx'), { ssr: false });
 
 TimeAgo.addLocale(en)
@@ -43,6 +47,8 @@ const MapSection: React.FC = () => {
     const {isOpen: isOpenEvent, onOpen: onOpenEvent, onOpenChange: onOpenChangeEvent} = useDisclosure()
     const {isOpen: isOpenFilters, onOpen: onOpenFilters, onOpenChange: onOpenChangeFilters} = useDisclosure()
     const {isOpen: isOpenStatus, onOpen: onOpenStatus, onOpenChange: onOpenChangeStatus} = useDisclosure()
+
+    const [showStatusBar, setShowStatusBar] = useState(true)
 
     const [viewState, setViewState] = useState({
         latitude: 0,
@@ -277,15 +283,51 @@ const MapSection: React.FC = () => {
                     </div>
                 </div>
 
-                {!isLoadingStatus && <div className={`${outfit.className} absolute flex flex-row gap-2 left-1/2 -translate-x-1/2 w-screen xl:w-[1280px] p-2 bottom-[24px]`}>
+                <AnimatePresence>
+                {!isLoadingStatus && !showStatusBar && user && 
+                    <motion.div 
+                    initial={{opacity: 0}}
+                    animate={{opacity: 1}}
+                    exit={{opacity: 0}}
+                    transition={{duration: 0.1}}
+                    className={`${outfit.className} absolute flex flex-row gap-2 justify-between left-1/2 -translate-x-1/2 w-screen xl:w-[1280px] p-2 bottom-[24px]`}>
+                        <div className='w-fit mr-0 ml-auto flex flex-row gap-2 h-fit p-2 bg-background/50 rounded-full backdrop-blur-lg border-1 border-foreground/10'>
+                                <Button radius='full'
+                                onPress={() => setShowStatusBar(true)}
+                                color='default'
+                                size='lg'
+                                isIconOnly
+                                startContent={
+                                    <Avatar src={user?.avatar_url} isBordered color={`${current ? current.active ? 'success' : 'default' : 'default'}`} name={user?.username}></Avatar>
+                                }/>
+                        </div>
+                    </motion.div>
+                }
+                </AnimatePresence>
+
+                <AnimatePresence>
+
+                {!isLoadingStatus && showStatusBar && user && 
+                <motion.div 
+                initial={{opacity: 0}}
+                animate={{opacity: 1}}
+                exit={{opacity: 0}}
+                transition={{duration: 0.1}}
+                className={`${outfit.className} absolute flex flex-row gap-2 left-1/2 -translate-x-1/2 w-screen xl:w-[1280px] p-2 bottom-[24px]`}>
                     <div className='w-fit max-w-md mx-auto flex flex-col gap-2 h-fit p-2 bg-background/50 rounded-2xl backdrop-blur-lg border-1 border-foreground/10'>
                         {!current && 
+                        <div className='flex flex-row gap-2'>
                         <Button 
+                        className='w-[90%]'
                         onPress={() => onOpenStatus()}
                         color='primary'
                         startContent={<RiScan2Fill size={24}/>}>
                             Set up an active status
-                        </Button>}
+                        </Button>
+                        <Button 
+                            onPress={() => setShowStatusBar(false)}
+                            isIconOnly variant='faded' color="default" startContent={<LuMinus size={20}/>}/>
+                        </div>}
                         {current && 
                         <div className='flex flex-row gap-2'>
                             <Button 
@@ -295,14 +337,19 @@ const MapSection: React.FC = () => {
                             className='w-[90%]' color={current.active ? "success" : "default"}>
                                 Looking For: {current.active ? "Active" : "Inactive"}
                             </Button>
+
                             <Button 
                             onPress={() => onOpenStatus()}
                             isIconOnly variant='faded' color="default" startContent={<RiEdit2Fill size={20}/>}/>
+                            <Button 
+                            onPress={() => setShowStatusBar(false)}
+                            isIconOnly variant='faded' color="default" startContent={<LuMinus size={20}/>}/>
                         </div>
                         }
-                        <span className='text-foreground/50 text-center px-8'>An active status means your location is shared in real-time with other players. Turn it off when you don&apos;t want to show up on the map</span>
+                        <span className='text-foreground/50 text-center px-8'>An active status means your location is shared in real-time with other players.</span>
                     </div>
-                </div>}
+                </motion.div>}
+                </AnimatePresence>
 
                 <Drawer size='lg' radius='lg' classNames={{
                     base: "h-[100vh] w-[300px] bg-background",
@@ -347,7 +394,7 @@ const MapSection: React.FC = () => {
                 </Drawer>
 
                 <Drawer isDismissable={false} radius='lg' classNames={{
-                    base: "min-h-[80vh] bg-background",
+                    base: "min-h-[80vh] max-h-[80vh] bg-background",
                 }} className='text-foreground' placement="bottom" backdrop="transparent" isOpen={isOpenStatus} onOpenChange={onOpenChangeStatus}>
                     <DrawerContent>
                         {(onClose) => (
@@ -364,7 +411,7 @@ const MapSection: React.FC = () => {
                 </Drawer>
 
                 <Drawer isDismissable={false} radius='lg' classNames={{
-                    base: "min-h-[100vh] bg-background",
+                    base: "min-h-[100vh] max-h-[100vh] bg-background",
                 }} className='text-foreground' placement="bottom" backdrop="transparent" isOpen={isOpen} onOpenChange={onOpenChange}>
                     <DrawerContent>
                         {(onClose) => (

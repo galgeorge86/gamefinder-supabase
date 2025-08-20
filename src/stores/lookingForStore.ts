@@ -73,6 +73,9 @@ export const useLookingForStore = create(
                     state.isLoading = false
                 })
             }
+            set((state) => {
+                state.isLoading = false
+            })
         },
         getActiveUsers: async () => {
             const res = await getActivePlayers()
